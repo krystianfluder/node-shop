@@ -16,7 +16,6 @@
   "dependencies": {
     "ejs": "^3.0.1",
     "express": "^4.17.1",
-    "mysql2": "^2.1.0",
-    "sqlstring": "^2.3.1"
+    "mysql2": "^2.1.0"
   }
 }

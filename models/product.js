@@ -1,5 +1,4 @@
 const db = require("../util/database");
-const SqlString = require("sqlstring");
 // const Cart = require("./cart");
 
 module.exports = class Product {
@@ -16,27 +15,19 @@ module.exports = class Product {
     if (id) {
       console.log(this);
       return db.execute(
-        `UPDATE products SET title=${SqlString.escape(
-          title
-        )}, price=${SqlString.escape(price)}, description=${SqlString.escape(
-          description
-        )}, imageUrl=${SqlString.escape(imageUrl)} WHERE id=${SqlString.escape(
-          id
-        )}`
+        "UPDATE products SET title=?, price=?, description=?, imageUrl=? WHERE id=?",
+        [title, price, description, imageUrl, id]
       );
     } else {
       return db.execute(
-        `INSERT INTO products (title, price, description, imageUrl) VALUES (${SqlString.escape(
-          title
-        )}, ${SqlString.escape(price)}, ${SqlString.escape(
-          description
-        )}, ${SqlString.escape(imageUrl)});`
+        "INSERT INTO products (title, price, description, imageUrl) VALUES (?, ?, ?,?)",
+        [title, price, description, imageUrl]
       );
     }
   }
 
   static deleteById(id) {
-    return db.execute(`DELETE FROM products WHERE id=${SqlString.escape(id)}`);
+    return db.execute("DELETE FROM products WHERE id=?", [id]);
   }
 
   static fetchAll() {
@@ -44,8 +35,6 @@ module.exports = class Product {
   }
 
   static findById(id) {
-    return db.execute(
-      `SELECT * FROM products WHERE id=${SqlString.escape(id)}`
-    );
+    return db.execute("SELECT * FROM products WHERE id=?", [id]);
   }
 };
