@@ -1,5 +1,35 @@
 const Product = require("../models/product");
 
+//test mongo
+
+const product = new Product();
+// setTimeout(() => {
+product.save();
+// }, 2000);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// //
+//
+//
+
+//
+//
+//
+// //
+
+// ////////////////////////////////////////////
+
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
@@ -9,13 +39,19 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
-  const price = req.body.price;
-  const description = req.body.description;
-  const product = new Product(null, title, imageUrl, description, price);
-  product.save();
-  res.redirect("/");
+  const { title, imageUrl, price, description } = req.body;
+  const product = Product.build({
+    title,
+    price,
+    imageUrl,
+    description
+  });
+  product
+    .save()
+    .then(() => {
+      res.redirect("/");
+    })
+    .catch(err => console.log(err));
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -24,9 +60,8 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect("/");
   }
   const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(([rows]) => {
-      const product = rows[0];
+  Product.findByPk(prodId)
+    .then(product => {
       if (!product) {
         return res.redirect("/");
       }
@@ -44,30 +79,34 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const { productId, title, price, imageUrl, description } = req.body;
-  const updatedProduct = new Product(
-    productId,
-    title,
-    imageUrl,
-    description,
-    price
-  );
-  console.log(productId);
-  updatedProduct
-    .save()
-    .then(() => {
-      res.redirect("/admin/products");
+  Product.findByPk(productId)
+    .then(product => {
+      product
+        .update({
+          title,
+          price,
+          imageUrl,
+          description
+        })
+        .then(() => {
+          res.redirect("/admin/products");
+        })
+        .catch(err => {
+          console.log(err);
+          res.redirect("/admin/products");
+        });
     })
     .catch(err => {
-      res.redirect("/admin/products");
       console.log(err);
+      res.redirect("/admin/products");
     });
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-    .then(([rows]) => {
+  Product.findAll()
+    .then(products => {
       res.render("admin/products", {
-        prods: rows,
+        prods: products,
         pageTitle: "Admin Products",
         path: "/admin/products"
       });
@@ -77,12 +116,13 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId)
-    .then(() => {
+  Product.findByPk(prodId)
+    .then(product => {
+      product.destroy();
       res.redirect("/admin/products");
     })
     .catch(err => {
-      res.redirect("/admin/products");
       console.log(err);
+      res.redirect("/admin/products");
     });
 };
