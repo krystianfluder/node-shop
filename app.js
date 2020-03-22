@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const errorController = require("./controllers/error");
 
 const sequelize = require("./util/database");
-const { mongoConnect } = require("./util/database2");
+// const { mongoConnect } = require("./util/database2");
 
 const app = express();
 
@@ -26,6 +26,7 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 // sequelize.sync();
-mongoConnect(() => {
-  app.listen(3000);
-});
+app.listen(8080);
+// mongoConnect(() => {
+//   app.listen(3000);
+// });

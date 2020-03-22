@@ -1,35 +1,5 @@
 const Product = require("../models/product");
 
-//test mongo
-
-const product = new Product();
-// setTimeout(() => {
-product.save();
-// }, 2000);
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-// //
-//
-//
-
-//
-//
-//
-// //
-
-// ////////////////////////////////////////////
-
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",

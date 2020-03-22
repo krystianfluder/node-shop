@@ -1,62 +1,40 @@
-const { getDb } = require("../util/database2");
+const Sequelize = require("sequelize");
+const { Model } = Sequelize;
+const sequelize = require("../util/database");
 
-class Product {
-  constructor(title, price, description, imageUrl) {
-    (this.title = title),
-      (this.price = price),
-      (this.description = description),
-      (this.imageUrl = imageUrl);
+class Product extends Model {}
+Product.init(
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true
+    },
+    title: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    price: {
+      type: Sequelize.DOUBLE,
+      allowNull: false
+    },
+    imageUrl: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    description: {
+      type: Sequelize.STRING,
+      allowNull: false
+    }
+  },
+  {
+    sequelize,
+    modelName: "product"
   }
-
-  save = async () => {
-    console.log("saving..............................");
-    const db = await getDb();
-    db.collection("products").insertOne({
-      name: "A book",
-      price: 12.99
-    });
-  };
-}
+);
 
 module.exports = Product;
-
-// const Sequelize = require("sequelize");
-// const { Model } = Sequelize;
-// const sequelize = require("../util/database");
-
-// class Product extends Model {}
-// Product.init(
-//   {
-//     id: {
-//       type: Sequelize.INTEGER,
-//       autoIncrement: true,
-//       allowNull: false,
-//       primaryKey: true
-//     },
-//     title: {
-//       type: Sequelize.STRING,
-//       allowNull: false
-//     },
-//     price: {
-//       type: Sequelize.DOUBLE,
-//       allowNull: false
-//     },
-//     imageUrl: {
-//       type: Sequelize.STRING,
-//       allowNull: false
-//     },
-//     description: {
-//       type: Sequelize.STRING,
-//       allowNull: false
-//     }
-//   },
-//   {
-//     sequelize,
-//     modelName: "product"
-//   }
-// );
-
-// module.exports = Product;
 
 // const db = require("../util/database");
 // // const Cart = require("./cart");
@@ -98,3 +76,25 @@ module.exports = Product;
 //     return db.execute("SELECT * FROM products WHERE id=?", [id]);
 //   }
 // };
+
+// const { getDb } = require("../util/database2");
+
+// class Product {
+//   constructor(title, price, description, imageUrl) {
+//     (this.title = title),
+//       (this.price = price),
+//       (this.description = description),
+//       (this.imageUrl = imageUrl);
+//   }
+
+//   save = async () => {
+//     console.log("saving..............................");
+//     const db = await getDb();
+//     db.collection("products").insertOne({
+//       name: "A book",
+//       price: 12.99
+//     });
+//   };
+// }
+
+// module.exports = Product;
