@@ -1,19 +1,24 @@
-// const Sequelize = require("sequelize");
-// const { Model } = Sequelize;
-// const sequelize = require("../util/database");
+const Sequelize = require("sequelize");
+const { Model } = Sequelize;
+const sequelize = require("../util/database");
 
-// class Cart extends Model {}
+class Cart extends Model {}
+Cart.init(
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true
+    }
+  },
+  {
+    sequelize,
+    modelName: "cart"
+  }
+);
 
-// Cart.init({});
-
-// const fs = require("fs");
-// const path = require("path");
-
-// const p = path.join(
-//   path.dirname(process.mainModule.filename),
-//   "data",
-//   "cart.json"
-// );
+module.exports = Cart;
 
 // module.exports = class Cart {
 //   static addProduct(id, productPrice) {

@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const User = require("../models/user");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -9,19 +10,21 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
+  const { user } = req;
   const { title, imageUrl, price, description } = req.body;
-  const product = Product.build({
-    title,
-    price,
-    imageUrl,
-    description
-  });
-  product
-    .save()
-    .then(() => {
-      res.redirect("/");
+  user
+    .createProduct({
+      title,
+      imageUrl,
+      price,
+      description
     })
-    .catch(err => console.log(err));
+    .then(() => {
+      res.redirect("/admin/products");
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -30,8 +33,10 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect("/");
   }
   const prodId = req.params.productId;
-  Product.findByPk(prodId)
-    .then(product => {
+  req.user
+    .getProducts({ where: { id: prodId } })
+    .then(products => {
+      const [product] = products;
       if (!product) {
         return res.redirect("/");
       }
@@ -73,7 +78,8 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
+  req.user
+    .getProducts()
     .then(products => {
       res.render("admin/products", {
         prods: products,

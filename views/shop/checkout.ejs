@@ -1,0 +1,33 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/cart.css">
+</head>
+
+<body>
+  <%- include('../includes/navigation.ejs') %>
+  <main>
+    <% if (products.length > 0) { %>
+    <div class="card">
+      <div class="card__content">
+        <h2>User data</h2>
+        <p>Name: <%= name %></p>
+        <p>Email: <%= email %></p>
+      </div>
+    </div>
+    <br>
+    <ul class="cart__item-list">
+      <% products.forEach(p => { %>
+      <li class="cart__item">
+        <h1><%= p.title %></h1>
+        <h2>Quantity: <%= p.cartitem.quantity %></h2>
+      </li>
+      <% }) %>
+    </ul>
+    <br>
+    <form action="/checkout" method="POST">
+      <button class="btn btn--center" type="submit">Submit Your Order</button>
+    </form>
+    <% } else { %>
+    <h1>No Products in Cart!</h1>
+    <% } %>
+  </main>
+  <%- include('../includes/end.ejs') %>

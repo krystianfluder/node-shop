@@ -183,6 +183,7 @@ form {
   display: inline-block;
   padding: 0.25rem 1rem;
   text-decoration: none;
+  text-align: center;
   font: inherit;
   border: 1px solid #00695c;
   color: #00695c;
@@ -206,6 +207,12 @@ form {
 .btn.danger:active {
   background: red;
   color: white;
+}
+
+.btn--center {
+  margin: 0 auto;
+  display: block;
+  width: 200px;
 }
 
 @media (min-width: 768px) {
