@@ -117,6 +117,7 @@ exports.getOrders = (req, res, next) => {
   req.user
     .getOrders()
     .then(orders => {
+      console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Your Orders",
@@ -151,12 +152,32 @@ exports.postCheckout = (req, res, next) => {
   req.user
     .getCart()
     .then(cart => {
-      cart
-        .createOrder()
-        .then(() => {
-          console.log("sdf");
+      return cart.getProducts();
+    })
+    .then(products => {
+      req.user
+        .createOrder({
+          products
+        })
+        .then(order => {
+          console.log(order);
+          // return order.addProducts(
+          //   products.map(product => {
+          //     // console.log(product.dataValues.cartitem.dataValues.quantity);
+          //     const qty = product.dataValues.cartitem.dataValues.quantity;
+          //     console.log(product.dataValues);
+          //     // product.dataValues.orderitem.dataValues.quantity = qty;
+          //     // product.dataValues.orderitem = {
+          //     //   quantity: product.dataValues.cartitem.dataValues.quantity
+          //     // };
+          //     return product;
+          //   })
+          // );
         })
         .catch(err => console.log(err));
+      // console.log(products);
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log(err);
+    });
 };
