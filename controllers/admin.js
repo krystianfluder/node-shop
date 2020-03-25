@@ -10,8 +10,16 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
+  console.log(req.profile);
   const { title, imageUrl, price, description } = req.body;
-  const product = new Product(null, title, imageUrl, price, description);
+  const product = new Product(
+    null,
+    title,
+    imageUrl,
+    price,
+    description,
+    req.profile._id
+  );
   product
     .save()
     .then(() => {
@@ -61,7 +69,14 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const { productId, title, imageUrl, price, description } = req.body;
-  const product = new Product(productId, title, imageUrl, price, description);
+  const product = new Product(
+    productId,
+    title,
+    imageUrl,
+    price,
+    description,
+    req.profile._id
+  );
   return product
     .save()
     .then(() => {

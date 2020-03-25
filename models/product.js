@@ -2,17 +2,18 @@ const { ObjectID } = require("mongodb");
 const { getDb } = require("../util/database2");
 
 class Product {
-  constructor(id, title, imageUrl, price, description) {
+  constructor(id, title, imageUrl, price, description, profileId) {
     this.id = id;
     this.title = title;
     this.imageUrl = imageUrl;
     this.price = price;
     this.description = description;
+    this.profileId = profileId;
   }
 
   save() {
     const collection = getDb().collection("products");
-    const { id, title, imageUrl, description, price } = this;
+    const { id, title, imageUrl, description, price, profileId } = this;
     if (id) {
       //update
       return collection
@@ -25,7 +26,8 @@ class Product {
               title,
               imageUrl,
               price,
-              description
+              description,
+              profileId
             }
           }
         )
@@ -42,7 +44,8 @@ class Product {
           title,
           imageUrl,
           price,
-          description
+          description,
+          profileId
         })
         .then(result => {
           console.log(result);
