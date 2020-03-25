@@ -17,8 +17,11 @@ const mongoConnect = callback => {
     });
 };
 
-const getDb = async () => {
-  await _db;
+const getDb = () => {
+  if (_db) {
+    return _db;
+  }
+  throw "No database found!";
 };
 
 exports.mongoConnect = mongoConnect;
