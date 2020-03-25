@@ -5,7 +5,9 @@ const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${proce
 let _db;
 
 const mongoConnect = callback => {
-  MongoClient.connect(url)
+  MongoClient.connect(url, {
+    useUnifiedTopology: true
+  })
     .then(client => {
       console.log("Connected!");
       _db = client.db();

@@ -24,23 +24,16 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use((req, res, next) => {
   Profile.findOne("5e7b1b556b68f612f2fb1fd7")
     .then(profile => {
-      req.profile = profile;
+      req.profile = new Profile(
+        profile.name,
+        profile.email,
+        profile.cart,
+        profile._id
+      );
       next();
     })
     .catch(err => console.log(err));
 });
-
-// app.use((req, res, next) => {
-//   Profile.findOne("5e7b145a6b68f612f2fb1fd6")
-//     .then(profile => {
-//       // req.profile = profile;
-//       next();
-//     })
-//     .catch(err => {
-//       console.log(err);
-//     });
-//   next();
-// });
 
 app.use("/admin", adminRoutes);
 // app.use("/profile", profileRoutes);
