@@ -47,6 +47,24 @@ class Profile {
     );
   }
 
+  deleteFromCart(productId) {
+    const collection = getDb().collection("profiles");
+    const updatedCartItems = this.cart.items.filter(
+      item => item.productId.toString() !== productId.toString()
+    );
+    console.log(updatedCartItems);
+    return collection.updateOne(
+      {
+        _id: ObjectID(this._id)
+      },
+      {
+        $set: {
+          cart: { items: updatedCartItems }
+        }
+      }
+    );
+  }
+
   getCart() {
     const collection = getDb().collection("products");
     const productsId = this.cart.items.map(item => {
