@@ -1,11 +1,11 @@
-const { Sequelize } = require("sequelize");
+// const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize("node-complete", "root", "1qazxsW@", {
-  host: "localhost",
-  dialect: "mysql"
-});
+// const sequelize = new Sequelize("node-complete", "root", "1qazxsW@", {
+//   host: "localhost",
+//   dialect: "mysql"
+// });
 
-module.exports = sequelize;
+// module.exports = sequelize;
 // const pool = mysql.createPool({
 //   host: "localhost",
 //   user: "root",
