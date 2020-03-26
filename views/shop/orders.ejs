@@ -6,11 +6,16 @@
     <%- include('../includes/navigation.ejs') %>
     <main>
         <% if (orders.length > 0) { %>
-        <ul class="cart__item-list">
+        <ul class="card">
             <% orders.forEach(order => { %>
             <li class="cart__item">
                 <h1>Order</h1>
                 <h2>Quantity: <%= order.createdAt %></h2>
+                <ul>
+                    <% order.items.forEach(item => { %>
+                    <p><%= item.title %> (<%= item.quantity %>)</p>
+                    <% }) %>
+                </ul>
 
             </li>
             <% })%>

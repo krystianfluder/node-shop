@@ -85,6 +85,45 @@ class Profile {
       });
   }
 
+  addOrder() {
+    const db = getDb();
+    return this.getCart()
+      .then(products => {
+        const order = {
+          items: products,
+          profile: {
+            _id: new ObjectID(this._id),
+            name: this.name,
+            email: this.email
+          },
+          createdAt: new Date()
+        };
+        db.collection("orders").insertOne(order);
+      })
+      .then(() => {
+        this.cart = { items: [] };
+        return db
+          .collection("profiles")
+          .updateOne(
+            { _id: ObjectID(this._id) },
+            { $set: { cart: { items: [] } } }
+          );
+      })
+      .then(result => result)
+      .catch(err => console.log(err));
+  }
+
+  getOrders() {
+    const collection = getDb().collection("orders");
+    return collection
+      .find({ "profile._id": ObjectID(this._id) })
+      .toArray()
+      .then(orders => {
+        return orders;
+      })
+      .catch(err => console.log(err));
+  }
+
   static findOne(id) {
     const collection = getDb().collection("profiles");
     return collection
