@@ -45,20 +45,10 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  const { items } = req.profile.cart;
-  const productsId = items.map(item => {
-    return item.productId;
-  });
-  Product.findMany(productsId)
+  req.profile
+    .getCart()
     .then(products => {
-      const updateProducts = [...products];
-      for (const product of updateProducts) {
-        for (const item of items) {
-          if (item.productId.toString() === product._id.toString()) {
-            product.quantity = item.quantity;
-          }
-        }
-      }
+      console.log(products);
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",

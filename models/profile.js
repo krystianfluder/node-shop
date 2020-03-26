@@ -47,12 +47,25 @@ class Profile {
     );
   }
 
-  // static fetchCart(id) {
-  //   const collection = getDb().collection("profiles");
-  //   return collection.findOne({
-  //     _id: ObjectID(id)
-  //   });
-  // }
+  getCart() {
+    const collection = getDb().collection("products");
+    const productsId = this.cart.items.map(item => {
+      return item.productId;
+    });
+    return collection
+      .find({ _id: { $in: productsId } })
+      .toArray()
+      .then(products => {
+        return products.map(product => {
+          return {
+            ...product,
+            quantity: this.cart.items.find(item => {
+              return item.productId.toString() === product._id.toString();
+            }).quantity
+          };
+        });
+      });
+  }
 
   static findOne(id) {
     const collection = getDb().collection("profiles");
