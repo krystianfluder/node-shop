@@ -89,6 +89,17 @@ class Product {
       })
       .catch(err => console.log(err));
   };
+
+  static findMany = productsId => {
+    const collection = getDb().collection("products");
+    return collection
+      .find({ _id: { $in: productsId } })
+      .toArray()
+      .then(products => {
+        return products;
+      })
+      .catch(err => console.log(err));
+  };
 }
 
 module.exports = Product;

@@ -1,3 +1,5 @@
+const { ObjectID } = require("mongodb");
+
 const Product = require("../models/product");
 const Profile = require("../models/profile");
 // const Cart = require("../models/cart");
@@ -43,11 +45,19 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  Profile.findOne(req.profile._id)
-    .then(profile => {
-      let products = [];
-      if (profile.cart) {
-        products = profile.cart.items;
+  const { items } = req.profile.cart;
+  const productsId = items.map(item => {
+    return item.productId;
+  });
+  Product.findMany(productsId)
+    .then(products => {
+      const updateProducts = [...products];
+      for (const product of updateProducts) {
+        for (const item of items) {
+          if (item.productId.toString() === product._id.toString()) {
+            product.quantity = item.quantity;
+          }
+        }
       }
       res.render("shop/cart", {
         path: "/cart",
