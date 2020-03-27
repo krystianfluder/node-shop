@@ -52,7 +52,6 @@ exports.getCart = (req, res, next) => {
     .populate("cart.items.productId")
     .execPopulate()
     .then(profile => {
-      console.log(profile);
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
@@ -126,7 +125,7 @@ exports.getCheckout = (req, res, next) => {
     .then(profile => {
       const { name, email } = profile;
       const products = profile.cart.items;
-      console.log(products);
+      console.log(profile);
       res.render("shop/checkout", {
         path: "/checkout",
         pageTitle: "Checkout",
