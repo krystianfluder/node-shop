@@ -1,3 +1,119 @@
+const mongoose = require("mongoose");
+
+const { Schema } = mongoose;
+
+const profileSchema = Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  cart: {
+    items: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true
+        },
+        quantity: {
+          type: Number,
+          required: true
+        }
+      }
+    ]
+  }
+});
+
+profileSchema.methods.addToCart = function(product) {
+  const cartProductIndex = this.cart.items.findIndex(cp => {
+    return cp.productId.toString() === product._id.toString();
+  });
+  let newQuantity = 1;
+  const updatedCartItems = [...this.cart.items];
+
+  if (cartProductIndex >= 0) {
+    newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+    updatedCartItems[cartProductIndex].quantity = newQuantity;
+  } else {
+    updatedCartItems.push({
+      productId: product._id,
+      quantity: newQuantity
+    });
+  }
+  const updatedCart = {
+    items: updatedCartItems
+  };
+
+  this.cart = updatedCart;
+
+  return this.save();
+};
+
+profileSchema.methods.removeFromCart = function(productId) {
+  const updatedCartItems = this.cart.items.filter(item => {
+    return item.productId.toString() !== productId.toString();
+  });
+  this.cart.items = updatedCartItems;
+  return this.save();
+};
+
+const Profile = mongoose.model("Profile", profileSchema);
+
+module.exports = Profile;
+// const collection = getDb().collection("profiles");
+// collection.updateOne(
+//   {
+//     _id: ObjectID(this._id)
+//   },
+//   {
+//     $set: {
+//       cart: updatedCart
+//     }
+//   }
+// );
+
+//   deleteFromCart(productId) {
+//     const collection = getDb().collection("profiles");
+//     const updatedCartItems = this.cart.items.filter(
+//       item => item.productId.toString() !== productId.toString()
+//     );
+//     console.log(updatedCartItems);
+//     return collection.updateOne(
+//       {
+//         _id: ObjectID(this._id)
+//       },
+//       {
+//         $set: {
+//           cart: { items: updatedCartItems }
+//         }
+//       }
+//     );
+//   }
+
+//   getCart() {
+//     const collection = getDb().collection("products");
+//     const productsId = this.cart.items.map(item => {
+//       return item.productId;
+//     });
+//     return collection
+//       .find({ _id: { $in: productsId } })
+//       .toArray()
+//       .then(products => {
+//         return products.map(product => {
+//           return {
+//             ...product,
+//             quantity: this.cart.items.find(item => {
+//               return item.productId.toString() === product._id.toString();
+//             }).quantity
+//           };
+//         });
+//       });
+//   }
+
 // const { ObjectID } = require("mongodb");
 // const { getDb } = require("../util/database2");
 
@@ -45,44 +161,6 @@
 //         }
 //       }
 //     );
-//   }
-
-//   deleteFromCart(productId) {
-//     const collection = getDb().collection("profiles");
-//     const updatedCartItems = this.cart.items.filter(
-//       item => item.productId.toString() !== productId.toString()
-//     );
-//     console.log(updatedCartItems);
-//     return collection.updateOne(
-//       {
-//         _id: ObjectID(this._id)
-//       },
-//       {
-//         $set: {
-//           cart: { items: updatedCartItems }
-//         }
-//       }
-//     );
-//   }
-
-//   getCart() {
-//     const collection = getDb().collection("products");
-//     const productsId = this.cart.items.map(item => {
-//       return item.productId;
-//     });
-//     return collection
-//       .find({ _id: { $in: productsId } })
-//       .toArray()
-//       .then(products => {
-//         return products.map(product => {
-//           return {
-//             ...product,
-//             quantity: this.cart.items.find(item => {
-//               return item.productId.toString() === product._id.toString();
-//             }).quantity
-//           };
-//         });
-//       });
 //   }
 
 //   addOrder() {

@@ -19,6 +19,11 @@ const productSchema = Schema(
     imageUrl: {
       type: String,
       required: true
+    },
+    profileId: {
+      type: Schema.Types.ObjectId,
+      ref: "Profile",
+      required: true
     }
   },
   { timestamps: true }

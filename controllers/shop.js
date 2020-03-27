@@ -7,7 +7,10 @@ const Profile = require("../models/profile");
 
 exports.getIndex = (req, res, next) => {
   Product.find()
+    // .select("title -name")
+    // .populate("profileId", "cart")
     .then(products => {
+      console.log(products);
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
@@ -46,13 +49,14 @@ exports.getProduct = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   req.profile
-    .getCart()
-    .then(products => {
-      console.log(products);
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then(profile => {
+      console.log(profile);
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
-        products
+        products: profile.cart.items
       });
     })
     .catch(err => console.log(err));
@@ -60,7 +64,7 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findOne(prodId)
+  Product.findById(prodId)
     .then(product => {
       req.profile.addToCart(product);
       res.redirect("/cart");
@@ -71,8 +75,9 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   req.profile
-    .deleteFromCart(prodId)
-    .then(() => {
+    .removeFromCart(prodId)
+    .then(result => {
+      console.log(result);
       res.redirect("/cart");
     })
     .catch(err => console.log(err));

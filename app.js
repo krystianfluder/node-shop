@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const errorController = require("./controllers/error");
-// const Profile = require("./models/profile");
+const Profile = require("./models/profile");
 
 const app = express();
 
@@ -19,19 +19,14 @@ const shopRoutes = require("./routes/shop");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use((req, res, next) => {
-//   Profile.findOne("5e7b1b556b68f612f2fb1fd7")
-//     .then(profile => {
-//       req.profile = new Profile(
-//         profile.name,
-//         profile.email,
-//         profile.cart,
-//         profile._id
-//       );
-//       next();
-//     })
-//     .catch(err => console.log(err));
-// });
+app.use((req, res, next) => {
+  Profile.findById("5e7c89866fa64f14a3c663b4")
+    .then(profile => {
+      req.profile = profile;
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
@@ -47,6 +42,15 @@ mongoose
     }
   )
   .then(() => {
+    // const profile = new Profile({
+    //   name: "test",
+    //   email: "test@test.com",
+    //   cart: {
+    //     items: []
+    //   }
+    // });
+    // profile.save();
+
     app.listen(8080);
   })
   .catch(err => console.log(err));
