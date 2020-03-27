@@ -1,9 +1,9 @@
-const { ObjectID } = require("mongodb");
+// const { ObjectID } = require("mongodb");
 
 const Product = require("../models/product");
-const Profile = require("../models/profile");
+// const Profile = require("../models/profile");
 // const Cart = require("../models/cart");
-// const Order = require("../models/order");
+const Order = require("../models/order");
 
 exports.getIndex = (req, res, next) => {
   Product.find()
@@ -84,8 +84,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  req.profile
-    .getOrders()
+  Order.find({ "profile.profileId": req.profile._id })
     .then(orders => {
       console.log(orders);
       res.render("shop/orders", {
@@ -95,13 +94,39 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch(err => console.log(err));
+  // Order.find()
+  //   .select("products")
+  //   .then(orders => {
+  //     console.log(orders);
+  //     res
+  //       .render("shop/orders", {
+  //         path: "/orders",
+  //         pageTitle: "Orders",
+  //         orders: orders.products
+  //       })
+  //       .catch(err => console.log(err));
+  //   });
+  // req.profile
+  //   .getOrders()
+  //   .then(orders => {
+  //     console.log(orders);
+  //     res.render("shop/orders", {
+  //       path: "/orders",
+  //       pageTitle: "Orders",
+  //       orders
+  //     });
+  //   })
+  //   .catch(err => console.log(err));
 };
 
 exports.getCheckout = (req, res, next) => {
-  const { name, email } = req.profile;
   req.profile
-    .getCart()
-    .then(products => {
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then(profile => {
+      const { name, email } = profile;
+      const products = profile.cart.items;
+      console.log(products);
       res.render("shop/checkout", {
         path: "/checkout",
         pageTitle: "Checkout",
@@ -115,7 +140,26 @@ exports.getCheckout = (req, res, next) => {
 
 exports.postCheckout = (req, res, next) => {
   req.profile
-    .addOrder()
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then(profile => {
+      const products = profile.cart.items.map(i => {
+        return {
+          quantity: i.quantity,
+          product: { ...i.productId._doc }
+        };
+      });
+      const order = new Order({
+        profile: {
+          profileId: req.profile._id
+        },
+        products
+      });
+      return order.save();
+    })
+    .then(() => {
+      return req.profile.clearCart();
+    })
     .then(() => {
       res.redirect("/orders");
     })

@@ -61,6 +61,11 @@ profileSchema.methods.removeFromCart = function(productId) {
   return this.save();
 };
 
+profileSchema.methods.clearCart = function() {
+  this.cart = { items: [] };
+  return this.save();
+};
+
 const Profile = mongoose.model("Profile", profileSchema);
 
 module.exports = Profile;
