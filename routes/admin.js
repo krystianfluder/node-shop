@@ -3,15 +3,11 @@ const path = require("path");
 const express = require("express");
 
 const adminController = require("../controllers/admin");
+const isAuth = require("../middleware/is-auth");
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-  if (!req.session.isLoggedIn) {
-    return res.redirect("/login");
-  }
-  next();
-});
+router.use(isAuth);
 
 router.get("/add-product", adminController.getAddProduct);
 
