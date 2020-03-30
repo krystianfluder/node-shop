@@ -17,8 +17,10 @@ exports.getRegister = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  Profile.findById("5e7c89866fa64f14a3c663b4")
-    .then(profile => {
+  const { email, password } = req.body;
+  Profile.find({ email })
+    .then(profileData => {
+      const [profile] = profileData;
       req.session.isLoggedIn = true;
       req.session.profile = profile;
       req.session.save(err => {
@@ -37,7 +39,22 @@ exports.postLogin = (req, res, next) => {
   // req.session.isLoggedIn = true;
 };
 
-exports.postRegister = (req, res, next) => {};
+exports.postRegister = (req, res, next) => {
+  const { email, password, password2 } = req.body;
+
+  Profile.find({ email })
+    .then(profileData => {
+      if (!profileData) {
+        return res.redirect("/register");
+      }
+      const profile = new Profile({ email, password, cart: { items: [] } });
+      return profile.save();
+    })
+    .then(() => {
+      res.redirect("/login");
+    })
+    .catch(err => console.log(err));
+};
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy();
