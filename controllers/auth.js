@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const Profile = require("../models/profile");
 
 exports.getLogin = (req, res, next) => {
@@ -18,17 +19,30 @@ exports.getRegister = (req, res, next) => {
 
 exports.postLogin = (req, res, next) => {
   const { email, password } = req.body;
-  Profile.find({ email })
-    .then(profileData => {
-      const [profile] = profileData;
-      req.session.isLoggedIn = true;
-      req.session.profile = profile;
-      req.session.save(err => {
-        if (err) console.log(err);
-        res.redirect("/");
-      });
+
+  Profile.findOne({ email })
+    .then(profile => {
+      if (!profile) {
+        return res.redirect("/login");
+      }
+      bcrypt
+        .compare(password, profile.password)
+        .then(result => {
+          if (result) {
+            req.session.isLoggedIn = true;
+            req.session.profile = profile;
+            return req.session.save(err => {
+              if (err) console.log(err);
+              return res.redirect("/");
+            });
+          }
+          res.redirect("/login");
+        })
+        .catch(err => {
+          res.redirect("/login");
+          console.log(err);
+        });
     })
-    .then(() => {})
     .catch(err => console.log(err));
   // res.setHeader(
   //   "Set-Cookie",
@@ -41,13 +55,24 @@ exports.postLogin = (req, res, next) => {
 
 exports.postRegister = (req, res, next) => {
   const { email, password, password2 } = req.body;
+  console.log(email, password, password2);
 
-  Profile.find({ email })
+  if (password !== password2) {
+    return res.redirect("/register");
+  }
+  Profile.findOne({ email })
     .then(profileData => {
-      if (!profileData) {
+      if (profileData) {
         return res.redirect("/register");
       }
-      const profile = new Profile({ email, password, cart: { items: [] } });
+      return bcrypt.hash(password, 12);
+    })
+    .then(hashedPassword => {
+      const profile = new Profile({
+        email,
+        password: hashedPassword,
+        cart: { items: [] }
+      });
       return profile.save();
     })
     .then(() => {

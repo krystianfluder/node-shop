@@ -65,15 +65,6 @@ mongoose
     }
   )
   .then(() => {
-    // const profile = new Profile({
-    //   name: "test",
-    //   email: "test@test.com",
-    //   cart: {
-    //     items: []
-    //   }
-    // });
-    // profile.save();
-
     app.listen(8080);
   })
   .catch(err => console.log(err));

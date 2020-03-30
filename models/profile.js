@@ -2,31 +2,34 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
-const profileSchema = Schema({
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  cart: {
-    items: [
-      {
-        productId: {
-          type: Schema.Types.ObjectId,
-          ref: "Product",
-          required: true
-        },
-        quantity: {
-          type: Number,
-          required: true
+const profileSchema = Schema(
+  {
+    email: {
+      type: String,
+      required: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    cart: {
+      items: [
+        {
+          productId: {
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+            required: true
+          },
+          quantity: {
+            type: Number,
+            required: true
+          }
         }
-      }
-    ]
-  }
-});
+      ]
+    }
+  },
+  { timestamps: true }
+);
 
 profileSchema.methods.addToCart = function(product) {
   const cartProductIndex = this.cart.items.findIndex(cp => {
