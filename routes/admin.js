@@ -6,6 +6,13 @@ const adminController = require("../controllers/admin");
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  if (!req.session.isLoggedIn) {
+    return res.redirect("/login");
+  }
+  next();
+});
+
 router.get("/add-product", adminController.getAddProduct);
 
 router.get("/products", adminController.getProducts);
