@@ -2,16 +2,30 @@ const bcrypt = require("bcryptjs");
 const Profile = require("../models/profile");
 
 exports.getLogin = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/login", {
     path: "/login",
-    pageTitle: "Login"
+    pageTitle: "Login",
+    errorMessage: message
   });
 };
 
 exports.getRegister = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/register", {
     path: "/register",
-    pageTitle: "Register"
+    pageTitle: "Register",
+    errorMessage: message
   });
 };
 
@@ -21,6 +35,7 @@ exports.postLogin = (req, res, next) => {
   Profile.findOne({ email })
     .then(profile => {
       if (!profile) {
+        req.flash("error", "Invalid email or password.");
         return res.redirect("/login");
       }
       bcrypt
@@ -34,6 +49,7 @@ exports.postLogin = (req, res, next) => {
               return res.redirect("/");
             });
           }
+          req.flash("error", "Invalid email or password.");
           res.redirect("/login");
         })
         .catch(err => {
@@ -55,12 +71,20 @@ exports.postRegister = (req, res, next) => {
   const { email, password, password2 } = req.body;
   console.log(email, password, password2);
 
-  if (password !== password2) {
+  if (email === "") {
+    req.flash("error", "Email is invalid.");
     return res.redirect("/register");
   }
+
+  if (password !== password2) {
+    req.flash("error", "Different passwords.");
+    return res.redirect("/register");
+  }
+
   Profile.findOne({ email })
     .then(profileData => {
       if (profileData) {
+        req.flash("error", "Email exists.");
         return res.redirect("/register");
       }
       return bcrypt.hash(password, 12);
