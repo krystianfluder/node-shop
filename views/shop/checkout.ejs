@@ -24,6 +24,7 @@
     </ul>
     <br>
     <form action="/checkout" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn--center" type="submit">Submit Your Order</button>
     </form>
     <% } else { %>

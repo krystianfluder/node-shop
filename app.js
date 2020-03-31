@@ -6,9 +6,12 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
+const csrf = require("csurf");
 
 const errorController = require("./controllers/error");
 const Profile = require("./models/profile");
+
+const csrfProtection = csrf();
 
 const app = express();
 
@@ -32,6 +35,8 @@ app.use(
   })
 );
 
+app.use(csrfProtection);
+
 app.use((req, res, next) => {
   if (req.session.isLoggedIn) {
     Profile.findById(req.session.profile._id)
@@ -43,6 +48,12 @@ app.use((req, res, next) => {
   } else {
     next();
   }
+});
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 // app.use((req, res, next) => {

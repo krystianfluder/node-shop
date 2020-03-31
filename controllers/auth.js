@@ -4,16 +4,14 @@ const Profile = require("../models/profile");
 exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
     path: "/login",
-    pageTitle: "Login",
-    isAuthenticated: req.session.isLoggedIn
+    pageTitle: "Login"
   });
 };
 
 exports.getRegister = (req, res, next) => {
   res.render("auth/register", {
     path: "/register",
-    pageTitle: "Register",
-    isAuthenticated: req.session.isLoggedIn
+    pageTitle: "Register"
   });
 };
 
