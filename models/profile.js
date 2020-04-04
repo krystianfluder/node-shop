@@ -6,33 +6,35 @@ const profileSchema = Schema(
   {
     email: {
       type: String,
-      required: true
+      required: true,
     },
     password: {
       type: String,
-      required: true
+      required: true,
     },
+    resetToken: String,
+    resetTokenExpiration: Date,
     cart: {
       items: [
         {
           productId: {
             type: Schema.Types.ObjectId,
             ref: "Product",
-            required: true
+            required: true,
           },
           quantity: {
             type: Number,
-            required: true
-          }
-        }
-      ]
-    }
+            required: true,
+          },
+        },
+      ],
+    },
   },
   { timestamps: true }
 );
 
-profileSchema.methods.addToCart = function(product) {
-  const cartProductIndex = this.cart.items.findIndex(cp => {
+profileSchema.methods.addToCart = function (product) {
+  const cartProductIndex = this.cart.items.findIndex((cp) => {
     return cp.productId.toString() === product._id.toString();
   });
   let newQuantity = 1;
@@ -44,11 +46,11 @@ profileSchema.methods.addToCart = function(product) {
   } else {
     updatedCartItems.push({
       productId: product._id,
-      quantity: newQuantity
+      quantity: newQuantity,
     });
   }
   const updatedCart = {
-    items: updatedCartItems
+    items: updatedCartItems,
   };
 
   this.cart = updatedCart;
@@ -56,8 +58,8 @@ profileSchema.methods.addToCart = function(product) {
   return this.save();
 };
 
-profileSchema.methods.removeFromCart = function(productId) {
-  const updatedCartItems = this.cart.items.filter(item => {
+profileSchema.methods.removeFromCart = function (productId) {
+  const updatedCartItems = this.cart.items.filter((item) => {
     console.log("itemmmmmmmmmmmmmm", item, productId);
     return item.productId.toString() !== productId.toString();
   });
@@ -67,7 +69,7 @@ profileSchema.methods.removeFromCart = function(productId) {
   return this.save();
 };
 
-profileSchema.methods.clearCart = function() {
+profileSchema.methods.clearCart = function () {
   this.cart = { items: [] };
   return this.save();
 };

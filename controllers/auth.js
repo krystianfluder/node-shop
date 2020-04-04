@@ -116,8 +116,13 @@ exports.postRegister = (req, res, next) => {
 };
 
 exports.postLogout = (req, res, next) => {
-  req.session.destroy();
-  res.redirect("/");
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.redirect("/");
+    }
+  });
 };
 
 exports.getReset = (req, res, next) => {
@@ -141,6 +146,95 @@ exports.postReset = (req, res, next) => {
       return res.redirect("/reset");
     }
     const token = buffer.toString("hex");
-    console.log(token);
+    Profile.findOne({ email: req.body.email })
+      .then((profile) => {
+        if (!profile) {
+          req.flash("error", "Email not exist");
+          return res.redirect("/reset");
+        }
+        // console.log(profile);
+        profile.resetToken = token;
+        profile.resetTokenExpiration = Date.now() + 3600000;
+        return profile.save();
+      })
+      .then((profile) => {
+        if (profile) {
+          res.redirect("/reset");
+          console.log(profile.email);
+          const msg = {
+            to: profile.email,
+            from: "test@example.com",
+            subject: "Reset password",
+            html: `
+            <p>You requested a password reset</p>
+            <p>Click this <a href="http://localhost:8080/new-password/${token}">link</a> to set a new password</p>
+          `,
+          };
+          sgMail.send(msg);
+        }
+      })
+      .catch((err) => console.log(err));
   });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  res.render("auth/new-password", {
+    path: "/new-password",
+    pageTitle: "Set new password",
+    errorMessage: message,
+    token: "",
+  });
+};
+
+exports.getNewPasswordWithToken = (req, res, next) => {
+  const { token } = req.params;
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  res.render("auth/new-password", {
+    path: "/new-password",
+    pageTitle: "Set new password",
+    errorMessage: message,
+    token,
+  });
+};
+
+exports.postNewPassword = (req, res, next) => {
+  const { token, password } = req.body;
+  let resetProfile;
+  Profile.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((profile) => {
+      if (!profile) {
+        req.flash("error", "Token is invalid or expired");
+        return res.redirect(`/new-password/${token}`);
+      }
+      resetProfile = profile;
+      return bcrypt.hash(password, 12);
+    })
+    .then((hashedPassword) => {
+      if (hashedPassword) {
+        resetProfile.password = hashedPassword;
+        resetProfile.resetToken = undefined;
+        resetProfile.resetTokenExpiration = undefined;
+        return resetProfile.save();
+      }
+    })
+    .then((result) => {
+      if (result) {
+        return res.redirect("/login");
+      }
+    })
+    .catch((err) => console.log(err));
 };
