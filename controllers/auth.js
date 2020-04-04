@@ -48,6 +48,9 @@ exports.postLogin = (req, res, next) => {
           if (result) {
             req.session.isLoggedIn = true;
             req.session.profile = profile;
+            if (profile.isAdmin) {
+              req.session.isAdmin = true;
+            }
             return req.session.save((err) => {
               if (err) console.log(err);
               return res.redirect("/");
@@ -117,11 +120,8 @@ exports.postRegister = (req, res, next) => {
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.redirect("/");
-    }
+    if (err) console.log(err);
+    return res.redirect("/");
   });
 };
 

@@ -4,10 +4,10 @@ const express = require("express");
 
 const adminController = require("../controllers/admin");
 const isAuth = require("../middleware/is-auth");
-
+const isAdmin = require("../middleware/is-admin");
 const router = express.Router();
 
-router.use(isAuth);
+router.use(isAuth, isAdmin);
 
 router.get("/add-product", adminController.getAddProduct);
 

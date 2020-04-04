@@ -32,7 +32,7 @@ app.use(
     name: "session",
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({ mongooseConnection: mongoose.connection })
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 );
 
@@ -42,11 +42,11 @@ app.use(flash());
 app.use((req, res, next) => {
   if (req.session.isLoggedIn) {
     Profile.findById(req.session.profile._id)
-      .then(profile => {
+      .then((profile) => {
         req.profile = profile;
         next();
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
   } else {
     next();
   }
@@ -54,6 +54,7 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.isAdmin = req.session.isAdmin;
   res.locals.csrfToken = req.csrfToken();
   next();
 });
@@ -74,10 +75,10 @@ mongoose
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     }
   )
   .then(() => {
     app.listen(8080);
   })
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
