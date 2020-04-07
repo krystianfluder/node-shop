@@ -1,3 +1,4 @@
+const { validationResult } = require("express-validator");
 const sgMail = require("@sendgrid/mail");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
@@ -16,6 +17,11 @@ exports.getLogin = (req, res, next) => {
     path: "/login",
     pageTitle: "Login",
     errorMessage: message,
+    oldInput: {
+      email: "",
+      password: "",
+    },
+    validationErrors: [],
   });
 };
 
@@ -30,11 +36,31 @@ exports.getRegister = (req, res, next) => {
     path: "/register",
     pageTitle: "Register",
     errorMessage: message,
+    oldInput: {
+      email: "",
+      password: "",
+      password2: "",
+    },
+    validationErrors: [],
   });
 };
 
 exports.postLogin = (req, res, next) => {
+  const errors = validationResult(req);
   const { email, password } = req.body;
+
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+      },
+      validationErrors: errors.array(),
+    });
+  }
 
   Profile.findOne({ email })
     .then((profile) => {
@@ -65,37 +91,28 @@ exports.postLogin = (req, res, next) => {
         });
     })
     .catch((err) => console.log(err));
-  // res.setHeader(
-  //   "Set-Cookie",
-  //   `loogedIn=false; expires=${new Date(
-  //     new Date().getTime() + 1000 * 3600
-  //   )}; HttpOnly=true`
-  // );
-  // req.session.isLoggedIn = true;
 };
 
 exports.postRegister = (req, res, next) => {
+  const errors = validationResult(req);
   const { email, password, password2 } = req.body;
-  console.log(email, password, password2);
 
-  if (email === "") {
-    req.flash("error", "Email is invalid.");
-    return res.redirect("/register");
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/register", {
+      path: "/register",
+      pageTitle: "Register",
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+        password2,
+      },
+      validationErrors: errors.array(),
+    });
   }
 
-  if (password !== password2) {
-    req.flash("error", "Different passwords.");
-    return res.redirect("/register");
-  }
-
-  Profile.findOne({ email })
-    .then((profileData) => {
-      if (profileData) {
-        req.flash("error", "Email exists.");
-        return res.redirect("/register");
-      }
-      return bcrypt.hash(password, 12);
-    })
+  bcrypt
+    .hash(password, 12)
     .then((hashedPassword) => {
       const profile = new Profile({
         email,
@@ -113,7 +130,7 @@ exports.postRegister = (req, res, next) => {
         text: "and easy to do anywhere, even with Node.js",
         html: "<strong>and easy to do anywhere, even with Node.js</strong>",
       };
-      sgMail.send(msg);
+      // sgMail.send(msg);
     })
     .catch((err) => console.log(err));
 };
