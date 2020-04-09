@@ -40,23 +40,27 @@ app.use(csrfProtection);
 app.use(flash());
 
 app.use((req, res, next) => {
-  if (req.session.isLoggedIn) {
-    Profile.findById(req.session.profile._id)
-      .then((profile) => {
-        req.profile = profile;
-        next();
-      })
-      .catch((err) => console.log(err));
-  } else {
-    next();
-  }
-});
-
-app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.isAdmin = req.session.isAdmin;
   res.locals.csrfToken = req.csrfToken();
   next();
+});
+
+app.use((req, res, next) => {
+  if (!req.session.profile) {
+    return next();
+  }
+  Profile.findById(req.session.profile._id)
+    .then((profile) => {
+      if (!profile) {
+        return next();
+      }
+      req.profile = profile;
+      next();
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
 });
 
 app.use("/admin", adminRoutes);
@@ -64,6 +68,8 @@ app.use(shopRoutes);
 app.use(authRoutes);
 
 app.use(errorController.get404);
+
+app.use(errorController.getError);
 
 mongoose
   .connect(
@@ -76,4 +82,6 @@ mongoose
   .then(() => {
     app.listen(8080);
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.log(err);
+  });

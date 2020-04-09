@@ -9,40 +9,50 @@ exports.getIndex = (req, res, next) => {
   Product.find()
     // .select("title -name")
     // .populate("profileId", "cart")
-    .then(products => {
+    .then((products) => {
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
-        path: "/"
+        path: "/",
       });
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
 
 exports.getProducts = (req, res, next) => {
   Product.find()
-    .then(products => {
+    .then((products) => {
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
-        path: "/products"
+        path: "/products",
       });
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findById(prodId)
-    .then(product => {
+    .then((product) => {
       res.render("shop/product-detail", {
         product,
         pageTitle: product.title,
-        path: "/products"
+        path: "/products",
       });
     })
-    .catch(err => {
-      console.log(err);
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
     });
 };
 
@@ -50,55 +60,71 @@ exports.getCart = (req, res, next) => {
   req.profile
     .populate("cart.items.productId")
     .execPopulate()
-    .then(profile => {
+    .then((profile) => {
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
-        products: profile.cart.items
+        products: profile.cart.items,
       });
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
-    .then(product => {
+    .then((product) => {
       req.profile.addToCart(product);
       res.redirect("/cart");
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   req.profile
     .removeFromCart(prodId)
-    .then(result => {
+    .then((result) => {
       console.log(result);
       res.redirect("/cart");
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
 
 exports.getOrders = (req, res, next) => {
   Order.find({ "profile.profileId": req.profile._id })
-    .then(orders => {
+    .then((orders) => {
       console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
-        orders
+        orders,
       });
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
 
 exports.getCheckout = (req, res, next) => {
   req.profile
     .populate("cart.items.productId")
     .execPopulate()
-    .then(profile => {
+    .then((profile) => {
       const { name, email } = profile;
       const products = profile.cart.items;
       console.log(profile);
@@ -107,28 +133,32 @@ exports.getCheckout = (req, res, next) => {
         pageTitle: "Checkout",
         products,
         name,
-        email
+        email,
       });
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
 
 exports.postCheckout = (req, res, next) => {
   req.profile
     .populate("cart.items.productId")
     .execPopulate()
-    .then(profile => {
-      const products = profile.cart.items.map(i => {
+    .then((profile) => {
+      const products = profile.cart.items.map((i) => {
         return {
           quantity: i.quantity,
-          product: { ...i.productId._doc }
+          product: { ...i.productId._doc },
         };
       });
       const order = new Order({
         profile: {
-          profileId: req.profile._id
+          profileId: req.profile._id,
         },
-        products
+        products,
       });
       return order.save();
     })
@@ -138,5 +168,9 @@ exports.postCheckout = (req, res, next) => {
     .then(() => {
       res.redirect("/orders");
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
 };
