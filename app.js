@@ -24,7 +24,8 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
+app.use("/images", express.static("images"));
 
 app.use(
   session({
@@ -69,7 +70,19 @@ app.use(authRoutes);
 
 app.use(errorController.get404);
 
-app.use(errorController.getError);
+app.use((error, req, res, next) => {
+  const status = error.status ? error.status : 500;
+
+  res.status(status).render("error", {
+    pageTitle: "Error",
+    path: "/error",
+    message: error.message,
+    status: status,
+    isAuthenticated: req.session.isLoggedIn,
+    isAdmin: req.session.isAdmin,
+    csrfToken: req.csrfToken(),
+  });
+});
 
 mongoose
   .connect(

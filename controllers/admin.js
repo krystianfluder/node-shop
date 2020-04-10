@@ -25,8 +25,25 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const { title, imageUrl, price, description } = req.body;
+  const { title, price, description } = req.body;
   const errors = validationResult(req);
+
+  if (!req.file) {
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Add Product",
+      path: "/admin/add-product",
+      editing: false,
+      product: {
+        title,
+        image: "",
+        price,
+        description,
+      },
+      errorMessage: "Image",
+      validationErrors: [],
+    });
+  }
+
   if (!errors.isEmpty()) {
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
@@ -34,7 +51,7 @@ exports.postAddProduct = (req, res, next) => {
       editing: false,
       product: {
         title,
-        imageUrl,
+        image: req.file,
         price,
         description,
       },
@@ -45,7 +62,7 @@ exports.postAddProduct = (req, res, next) => {
 
   const product = new Product({
     title,
-    imageUrl,
+    imageUrl: req.file.path,
     price,
     description,
     profileId: req.profile,
