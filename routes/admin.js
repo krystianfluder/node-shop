@@ -10,7 +10,7 @@ const isAuth = require("../middleware/is-auth");
 const isAdmin = require("../middleware/is-admin");
 const router = express.Router();
 
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "images");
   },
@@ -19,7 +19,19 @@ var storage = multer.diskStorage({
   },
 });
 
-var upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 router.use(isAuth, isAdmin);
 
 router.get("/add-product", adminController.getAddProduct);
