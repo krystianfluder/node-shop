@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+const PDFDocument = require("pdfkit");
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -91,7 +92,6 @@ exports.postCartDeleteProduct = (req, res, next) => {
   req.profile
     .removeFromCart(prodId)
     .then((result) => {
-      console.log(result);
       res.redirect("/cart");
     })
     .catch((err) => {
@@ -104,7 +104,6 @@ exports.postCartDeleteProduct = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   Order.find({ "profile.profileId": req.profile._id })
     .then((orders) => {
-      console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
@@ -129,17 +128,11 @@ exports.getInvoice = (req, res, next) => {
         return next(new Error("Unauthorized"));
       }
       const invoiceName = `invoice-${orderId}.pdf`;
-      const invoicePath = path.join(__dirname, "data", "invoices", invoiceName);
-      fs.exists(invoicePath, (exist) => {
-        console.log(exist, invoicePath);
-        if (!exist) {
-          return res.redirect("/orders");
-        }
-      });
-
+      const invoicePath = path.join("data", "invoices", invoiceName);
       const file = fs.createReadStream(invoicePath);
-      res.setHeader({ "Content-Type": "application/pdf" });
+      res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
+      file.pipe(res);
     })
     .catch((err) => {
       const error = new Error(err);
@@ -155,7 +148,6 @@ exports.getCheckout = (req, res, next) => {
     .then((profile) => {
       const { email } = profile;
       const products = profile.cart.items;
-      console.log(profile);
       res.render("shop/checkout", {
         path: "/checkout",
         pageTitle: "Checkout",
@@ -189,7 +181,26 @@ exports.postCheckout = (req, res, next) => {
       });
       return order.save();
     })
-    .then(() => {
+    .then((order) => {
+      const doc = new PDFDocument();
+      doc.pipe(fs.createWriteStream(`data/invoices/invoice-${order._id}.pdf`));
+      doc.text(`Thank you! ${req.profile.email}`);
+      doc.text(`Date of order: ${order.createdAt}`);
+      doc.text("Products: ");
+      let totalPrice = 0;
+      order.products.forEach((product) => {
+        const price = product.product.price * product.quantity;
+        totalPrice += price;
+        doc.text(
+          `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
+        );
+        doc.image(product.product.imageUrl, {
+          fit: [200, 200],
+          align: "left",
+        });
+      });
+      doc.text(`Total price: ${totalPrice}`);
+      doc.end();
       return req.profile.clearCart();
     })
     .then(() => {
