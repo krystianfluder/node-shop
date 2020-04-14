@@ -95,8 +95,9 @@ exports.getEditProduct = (req, res, next) => {
   Product.findById(prodId)
     .then((product) => {
       if (!product) {
-        return res.redirect("/");
+        return res.redirect("/admin/products");
       }
+      console.log(product);
       return res.render("admin/edit-product", {
         pageTitle: "Edit Product",
         path: "/admin/edit-product",
@@ -114,20 +115,36 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
-  const { productId, title, imageUrl, price, description } = req.body;
+  const { productId, title, price, description } = req.body;
+  if (!req.file) {
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Edit Product",
+      path: "/admin/edit-product",
+      editing: true,
+      product: {
+        _id: productId,
+        title,
+        image: "",
+        price,
+        description,
+      },
+      errorMessage: "Image",
+      validationErrors: [],
+    });
+  }
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).render("admin/edit-product", {
-      pageTitle: "Add Product",
+      pageTitle: "Edit Product",
       path: "/admin/edit-product",
-      editing: false,
+      editing: true,
       product: {
+        _id: productId,
         title,
-        imageUrl,
+        image: req.file,
         price,
         description,
-        productId,
       },
       errorMessage: errors.array()[0].msg,
       validationErrors: errors.array(),
@@ -136,8 +153,9 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(productId)
     .then((product) => {
+      console.log(product);
       product.title = title;
-      product.imageUrl = imageUrl;
+      product.imageUrl = req.file.path;
       product.price = price;
       product.description = description;
       return product.save();

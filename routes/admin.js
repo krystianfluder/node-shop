@@ -56,6 +56,7 @@ router.get("/edit-product/:productId", adminController.getEditProduct);
 
 router.post(
   "/edit-product",
+  upload.single("image"),
   [
     body("title")
       .trim()
@@ -64,7 +65,6 @@ router.post(
       .withMessage("Please enter a valid title, least 3 chars")
       .isAlphanumeric()
       .withMessage("Please enter a valid title, alphanumeric"),
-    body("imageUrl").trim().isURL().withMessage("Please enter a valid URL"),
     body("price")
       .trim()
       .escape()

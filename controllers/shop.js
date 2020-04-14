@@ -1,8 +1,6 @@
-// const { ObjectID } = require("mongodb");
-
+const path = require("path");
+const fs = require("fs");
 const Product = require("../models/product");
-// const Profile = require("../models/profile");
-// const Cart = require("../models/cart");
 const Order = require("../models/order");
 
 exports.getIndex = (req, res, next) => {
@@ -120,19 +118,48 @@ exports.getOrders = (req, res, next) => {
     });
 };
 
+exports.getInvoice = (req, res, next) => {
+  const { orderId } = req.params;
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return next(new Error("No order found"));
+      }
+      if (order.profile.profileId.toString() !== req.profile._id.toString()) {
+        return next(new Error("Unauthorized"));
+      }
+      const invoiceName = `invoice-${orderId}.pdf`;
+      const invoicePath = path.join(__dirname, "data", "invoices", invoiceName);
+      fs.exists(invoicePath, (exist) => {
+        console.log(exist, invoicePath);
+        if (!exist) {
+          return res.redirect("/orders");
+        }
+      });
+
+      const file = fs.createReadStream(invoicePath);
+      res.setHeader({ "Content-Type": "application/pdf" });
+      res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
+};
+
 exports.getCheckout = (req, res, next) => {
   req.profile
     .populate("cart.items.productId")
     .execPopulate()
     .then((profile) => {
-      const { name, email } = profile;
+      const { email } = profile;
       const products = profile.cart.items;
       console.log(profile);
       res.render("shop/checkout", {
         path: "/checkout",
         pageTitle: "Checkout",
         products,
-        name,
         email,
       });
     })
