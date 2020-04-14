@@ -1,8 +1,12 @@
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
+const sgMail = require("@sendgrid/mail");
+const baseUrl = require("../util/baseUrl");
 const Product = require("../models/product");
 const Order = require("../models/order");
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.getIndex = (req, res, next) => {
   Product.find()
@@ -201,10 +205,15 @@ exports.postCheckout = (req, res, next) => {
       });
       doc.text(`Total price: ${totalPrice}`);
       doc.end();
-      return req.profile.clearCart();
-    })
-    .then(() => {
+      req.profile.clearCart();
       res.redirect("/orders");
+      const msg = {
+        to: req.profile.email,
+        from: "test@example.com",
+        subject: "Thank you for order",
+        html: `<strong><a href="${baseUrl}/orders/${order._id}">Invoice</a></strong>`,
+      };
+      sgMail.send(msg);
     })
     .catch((err) => {
       const error = new Error(err);
