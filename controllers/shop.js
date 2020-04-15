@@ -8,15 +8,34 @@ const Order = require("../models/order");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+const ITEMS_PER_PAGE = 2;
+
 exports.getIndex = (req, res, next) => {
+  let page = req.query.page;
+  if (!page) {
+    page = 1;
+  }
+  let totalProducts;
+
   Product.find()
-    // .select("title -name")
-    // .populate("profileId", "cart")
+    .countDocuments()
+    .then((numProducts) => {
+      totalProducts = numProducts;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((products) => {
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
         path: "/",
+        totalProducts,
+        currentPage: page,
+        hasPrev: page > 1,
+        hasNext: page * ITEMS_PER_PAGE < totalProducts,
+        firstPage: 1,
+        lastPage: Math.ceil(totalProducts / ITEMS_PER_PAGE),
       });
     })
     .catch((err) => {
