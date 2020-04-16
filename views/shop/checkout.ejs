@@ -1,5 +1,6 @@
 <%- include('../includes/head.ejs') %>
 <link rel="stylesheet" href="/css/cart.css">
+<script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body>
@@ -23,12 +24,21 @@
       <% }) %>
     </ul>
     <br>
-    <form action="/checkout" method="POST">
+    <button id="order-btn" class="btn">ORDER</button>
+    <!-- <form action="/checkout" method="POST">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn--center" type="submit">Submit Your Order</button>
-    </form>
+    </form> -->
     <% } else { %>
     <h1>No Products in Cart!</h1>
     <% } %>
   </main>
   <%- include('../includes/end.ejs') %>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    var stripe = Stripe('pk_test_6Nw3PljmmhGzK3gt666dlyGh00XXNhDhir');
+    var orderBtn = document.getElementById('order-btn');
+    orderBtn.addEventListener('click', function() {
+      stripe.redirectToCheckout({sessionId: '<%= sessionId %>'})
+    })
+  </script>

@@ -1,3 +1,4 @@
+const stripe = require("stripe")(`${process.env.STRIPE_API_KEY}`);
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
@@ -171,23 +172,103 @@ exports.getInvoice = (req, res, next) => {
 };
 
 exports.getCheckout = (req, res, next) => {
+  let products;
+  let totalPrice = 0;
+  let email;
   req.profile
     .populate("cart.items.productId")
     .execPopulate()
     .then((profile) => {
-      const products = profile.cart.items;
-      let totalPrice = 0;
+      products = profile.cart.items;
+      totalPrice = 0;
       products.forEach((p) => {
         totalPrice += p.quantity * p.productId.price;
       });
-      const { email } = profile;
+      email = profile.email;
+
+      return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: products.map((p) => {
+          return {
+            name: p.productId.title,
+            description: p.productId.description,
+            amount: p.productId.price,
+            currency: "usd",
+            quantity: p.quantity,
+          };
+        }),
+        success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
+        cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
+      });
+    })
+    .then((session) => {
       res.render("shop/checkout", {
         path: "/checkout",
         pageTitle: "Checkout",
         products,
         email,
         totalPrice,
+        sessionId: session.id,
       });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.status = 500;
+      return next(error);
+    });
+};
+
+exports.getCheckoutSuccess = (req, res, next) => {
+  req.profile
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then((profile) => {
+      const products = profile.cart.items.map((i) => {
+        return {
+          quantity: i.quantity,
+          product: { ...i.productId._doc },
+        };
+      });
+      const order = new Order({
+        profile: {
+          profileId: req.profile._id,
+        },
+        products,
+      });
+      return order.save();
+    })
+    .then((order) => {
+      return order;
+    })
+    .then((order) => {
+      const doc = new PDFDocument();
+      doc.pipe(fs.createWriteStream(`data/invoices/invoice-${order._id}.pdf`));
+      doc.text(`Thank you! ${req.profile.email}`);
+      doc.text(`Date of order: ${order.createdAt}`);
+      doc.text("Products: ");
+      let totalPrice = 0;
+      order.products.forEach((product) => {
+        const price = product.product.price * product.quantity;
+        totalPrice += price;
+        doc.text(
+          `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
+        );
+        doc.image(product.product.imageUrl, {
+          fit: [200, 200],
+          align: "left",
+        });
+      });
+      doc.text(`Total price: ${totalPrice}`);
+      doc.end();
+      req.profile.clearCart();
+      res.redirect("/orders");
+      const msg = {
+        to: req.profile.email,
+        from: "test@example.com",
+        subject: "Thank you for order",
+        html: `<strong><a href="${baseUrl}/orders/${order._id}">Invoice</a></strong>`,
+      };
+      sgMail.send(msg);
     })
     .catch((err) => {
       const error = new Error(err);
@@ -214,6 +295,9 @@ exports.postCheckout = (req, res, next) => {
         products,
       });
       return order.save();
+    })
+    .then((order) => {
+      return order;
     })
     .then((order) => {
       const doc = new PDFDocument();
