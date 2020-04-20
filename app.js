@@ -1,5 +1,7 @@
 require("dotenv").config();
+const fs = require("fs");
 const path = require("path");
+const https = require("https");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -8,6 +10,9 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 
 const errorController = require("./controllers/error");
 const Profile = require("./models/profile");
@@ -22,6 +27,21 @@ app.set("views", "views");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  {
+    flags: "a",
+  }
+);
+
+app.use(helmet());
+app.use(compression());
+app.use(
+  morgan("combined", {
+    stream: accessLogStream,
+  })
+);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static("public"));
@@ -39,6 +59,9 @@ app.use(
 
 app.use(csrfProtection);
 app.use(flash());
+
+const privateKey = fs.readFileSync("server.key");
+const certificate = fs.readFileSync("server.cert");
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
@@ -85,15 +108,20 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(process.env.MONGO_CONNECT, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
-    app.listen(8080);
+    https
+      .createServer(
+        {
+          key: privateKey,
+          cert: certificate,
+        },
+        app
+      )
+      .listen(8080);
   })
   .catch((err) => {
     console.log(err);
