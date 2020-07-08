@@ -6,12 +6,12 @@
     <%- include('../includes/navigation.ejs') %>
     <main>
         <% if (products.length > 0) { %>
-        <h1 class="centered">Total price: <%= totalPrice %></h1>
+        <h1 class="centered">Total price: <%= totalPrice/100 %></h1>
         <ul class="cart__item-list">
             <% products.forEach(p => { %>
             <li class="cart__item">
                 <h1><%= p.productId.title %></h1>
-                <p><%= p.productId.price %> * <%= p.quantity %> = <%= p.productId.price * p.quantity %></p>
+                <p><%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %></p>
                 <form action="/cart-delete-item" method="POST">
                     <input type="hidden" value="<%= p.productId._id %>" name="productId">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">

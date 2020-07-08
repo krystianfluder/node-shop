@@ -36,7 +36,7 @@
   <%- include('../includes/end.ejs') %>
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-    var stripe = Stripe('pk_test_6Nw3PljmmhGzK3gt666dlyGh00XXNhDhir');
+    var stripe = Stripe('<%= process.env.STRIPE_PUBLIC_KEY %>');
     var orderBtn = document.getElementById('order-btn');
     orderBtn.addEventListener('click', function() {
       stripe.redirectToCheckout({sessionId: '<%= sessionId %>'})

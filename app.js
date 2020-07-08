@@ -1,4 +1,5 @@
 require("dotenv").config();
+const stripe = require("stripe")(`${process.env.STRIPE_SECRET_KEY}`);
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
@@ -56,6 +57,36 @@ app.use(
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 );
+
+// for improvment
+
+app.post("/webhook", (req, res, next) => {
+  console.log("run");
+  const sig = req.headers["stripe-signature"];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body.rawBody,
+      sig,
+      process.env.STRIPE_WHSEC
+    );
+  } catch (err) {
+    return res.send({ message: "Stripe - webhook error" });
+  }
+  console.log(event);
+  // handle type of webhook
+  switch (event.type) {
+    case "payment_intent.succeeded":
+      // send email with ebook, ebooks, token premium
+      //  update database, send shipping label, etc
+      console.log("success :D");
+      break;
+    case "payment_intent.payment_failed":
+      // payment failed
+      console.log("failed :D");
+      break;
+  }
+});
 
 app.use(csrfProtection);
 app.use(flash());

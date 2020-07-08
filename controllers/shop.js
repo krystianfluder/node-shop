@@ -1,13 +1,12 @@
-const stripe = require("stripe")(`${process.env.STRIPE_API_KEY}`);
+const stripe = require("stripe")(`${process.env.STRIPE_SECRET_KEY}`);
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
 const sgMail = require("@sendgrid/mail");
-const baseUrl = require("../util/baseUrl");
 const Product = require("../models/product");
 const Order = require("../models/order");
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_KEY);
 
 const ITEMS_PER_PAGE = 2;
 
@@ -193,7 +192,7 @@ exports.getCheckout = (req, res, next) => {
             name: p.productId.title,
             description: p.productId.description,
             amount: p.productId.price,
-            currency: "usd",
+            currency: "eur",
             quantity: p.quantity,
           };
         }),
@@ -266,7 +265,7 @@ exports.getCheckoutSuccess = (req, res, next) => {
         to: req.profile.email,
         from: "test@example.com",
         subject: "Thank you for order",
-        html: `<strong><a href="${baseUrl}/orders/${order._id}">Invoice</a></strong>`,
+        html: `<strong><a href="${process.env.BASE_URL}/orders/${order._id}">Invoice</a></strong>`,
       };
       sgMail.send(msg);
     })
@@ -325,7 +324,7 @@ exports.postCheckout = (req, res, next) => {
         to: req.profile.email,
         from: "test@example.com",
         subject: "Thank you for order",
-        html: `<strong><a href="${baseUrl}/orders/${order._id}">Invoice</a></strong>`,
+        html: `<strong><a href="${process.env.BASE_URL}/orders/${order._id}">Invoice</a></strong>`,
       };
       sgMail.send(msg);
     })

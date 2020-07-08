@@ -29,6 +29,8 @@ exports.postAddProduct = (req, res, next) => {
   const { title, price, description } = req.body;
   const errors = validationResult(req);
 
+  const parseCents = price();
+
   const response = (errorMessage, validationErrors) => {
     res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
