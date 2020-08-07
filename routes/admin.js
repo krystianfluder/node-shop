@@ -58,7 +58,7 @@ router.post(
       .trim()
       .escape()
       .isLength({ min: 10 })
-      .withMessage("Please enter a valid title, least 10 chars"),
+      .withMessage("Please enter a valid description, least 10 chars"),
   ],
 
   adminController.postAddProduct

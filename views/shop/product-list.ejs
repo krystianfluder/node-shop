@@ -3,40 +3,34 @@
 </head>
 
 <body>
-    <%- include('../includes/navigation.ejs') %>
-
-    <main>
-        <% if (prods.length > 0) { %>
-        <div class="grid">
-            <% for (let product of prods) { %>
-            <article class="card product-item">
-                <header class="card__header">
-                    <h1 class="product__title">
-                        <%= product.title %>
-                    </h1>
-                </header>
-                <div class="card__image">
-                    <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
-                </div>
-                <div class="card__content">
-                    <h2 class="product__price">$
-                        <%= product.price/100 %>
-                    </h2>
-                    <p class="product__description">
-                        <%= product.description %>
-                    </p>
-                </div>
-                <div class="card__actions">
-                    <a href="/products/<%= product._id %>" class="btn">Details</a>
-                    <% if (isAuthenticated) { %>
-                    <%- include('../includes/add-to-cart.ejs', {product: product}) %>
-                    <% } %>
-                </div>
-            </article>
+  <%- include('../includes/navigation.ejs') %>
+  <main class="container">
+    <h1>Products</h1>
+    <% if (prods.length > 0) { %>
+    <div class="row">
+      <% for (let product of prods) { %>
+        <div class="card" style="max-width: 18rem;">
+          <img class="card-image-top" src="/<%= product.imageUrl %>" alt="<%= product.title %>">
+          <div class="card-body">
+            <h2>
+              <%= product.title %>
+            </h2>
+            <p>$
+              <%= product.price/100 %>
+            </p>
+            <p class="product__description">
+              <%= product.description %>
+            </p>
+            <a href="/products/<%= product._id %>" class="btn btn-primary">Details</a>
+            <% if (isAuthenticated) { %>
+              <%- include('../includes/add-to-cart.ejs', {product: product}) %>
             <% } %>
+          </div>
         </div>
-        <% } else { %>
-        <h1>No Products Found!</h1>
-        <% } %>
-    </main>
-    <%- include('../includes/end.ejs') %>
+    <% } %>
+    </div>
+    <% } else { %>
+    <h1>No Products Found!</h1>
+    <% } %>
+  </main>
+  <%- include('../includes/end.ejs') %>
