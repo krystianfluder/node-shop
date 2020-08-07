@@ -9,7 +9,11 @@
   </li>
   <% } %>
 
-  <a class="active" href="?page=<%= currentPage %>"><%= currentPage %></a>
+  <li class="page-item">
+    <a class="page-link active" href="?page=<%= currentPage %>"
+      ><%= currentPage %></a
+    >
+  </li>
 
   <% if (hasNext) { %>
   <li class="page-item">

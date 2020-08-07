@@ -9,7 +9,7 @@
     <% if (prods.length > 0) { %>
     <div class="row">
       <% for (let product of prods) { %>
-        <div class="card" style="max-width: 18rem;">
+        <div class="card">
           <img class="card-image-top" src="/<%= product.imageUrl %>" alt="<%= product.title %>">
           <div class="card-body">
             <h2>
@@ -18,7 +18,7 @@
             <p>$
               <%= product.price/100 %>
             </p>
-            <p class="product__description">
+            <p">
               <%= product.description %>
             </p>
             <a href="/products/<%= product._id %>" class="btn btn-primary">Details</a>

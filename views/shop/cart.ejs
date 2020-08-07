@@ -4,25 +4,34 @@
 
 <body>
     <%- include('../includes/navigation.ejs') %>
-    <main>
+    <main class="container">
         <% if (products.length > 0) { %>
-        <h1 class="centered">Total price: <%= totalPrice/100 %></h1>
-        <ul class="cart__item-list">
+        <div class="row">
+            <div class="col-lg-6">
+                <h1>Cart</h1>
+                <h2>Total price: <%= totalPrice/100 %></h2>
+            </div>
+        </div>
+        <div class="row mt-4">
             <% products.forEach(p => { %>
-            <li class="cart__item">
-                <h1><%= p.productId.title %></h1>
-                <p><%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %></p>
-                <form action="/cart-delete-item" method="POST">
-                    <input type="hidden" value="<%= p.productId._id %>" name="productId">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <button class="btn danger" type="submit">Delete</button>
-                </form>
-            </li>
+            <div class="card" style="max-width: 18rem;">
+                <div class="card-body">
+                    <h3><%= p.productId.title %></h3>
+                    <p><%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %></p>
+                    <form action="/cart-delete-item" method="POST">
+                        <input type="hidden" value="<%= p.productId._id %>" name="productId">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button class="btn btn-danger" type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+            
             <% }) %>
-        </ul>
-        <hr>
-
-        <a class="btn btn--center" href="/checkout">Go To Checkout!</a>
+        </div>
+        <div class="row mt-4">
+            <a class="btn btn-primary" href="/checkout">Go To Checkout!</a>
+        </div>
+        
         <% } else { %>
         <h1>No Products in Cart!</h1>
         <% } %>
