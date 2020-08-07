@@ -10,35 +10,37 @@
         <% if (errorMessage) { %>
         <div class="profile-message profile-message--error"><%= errorMessage %></div>
         <% } %>
-        <form class="product-form"
-            action="/admin/<%= editing ? "edit-product" : "add-product" %>?_csrf=<%= csrfToken %>" method="POST"
-            enctype="multipart/form-data">
-            <div class="form-control">
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            action='/admin/<%= editing ? "edit-product" : "add-product" %>?_csrf=<%= csrfToken %>'
+        >
+            <div class="form-group">
                 <label for="title">Title</label>
-                <input class="<%= validationErrors.find(e => e.param === 'title') ? 'invalid' : '' %>" type="text"
+                <input class="form-control <%= validationErrors.find(e => e.param === 'title') ? 'invalid' : '' %>" type="text"
                     name="title" id="title" value="<%= product.title %>">
             </div>
 
-            <div class="form-control">
+            <div class="form-group">
                 <label for="image">Image</label>
-                <input type="file" name="image" id="image">
+                <input class="form-control-file" type="file" name="image" id="image">
             </div>
 
-            <div class="form-control">
+            <div class="form-group">
                 <label for="price">Price</label>
-                <input placeholder="cents" class="<%= validationErrors.find(e => e.param === 'price') ? 'invalid' : '' %>" type="number"
+                <input class="form-control <%= validationErrors.find(e => e.param === 'price') ? 'invalid' : '' %>" placeholder="cents"  type="number"
                     name="price" id="price" step="1" value="<%= product.price %>">
             </div>
-            <div class="form-control">
+            <div class="form-group">
                 <label for="description">Description</label>
-                <textarea class="<%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
+                <textarea class="form-control <%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
                     name="description" id="description" rows="5"><%= product.description %></textarea>
             </div>
 
             <input type="hidden" value="<%= product._id %>" name="productId">
 
             <!-- <input type="hidden" name="_csrf" value="<%= csrfToken %>"> -->
-            <button class="btn" type="submit"><% if (editing) { %>Update Product<% } else { %>Add
+            <button class="btn btn-primary" type="submit"><% if (editing) { %>Update Product<% } else { %>Add
                 Product<% } %></button>
         </form>
     </main>

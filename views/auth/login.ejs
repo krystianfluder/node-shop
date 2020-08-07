@@ -8,22 +8,22 @@
 
   <main>
     <% if (errorMessage) { %>
-    <div class="profile-message profile-message--error"><%= errorMessage %></div>
+    <div class="alert alert-primary"><%= errorMessage %></div>
     <% } %>
-    <form class="login-form" action="/login" method="POST">
-      <div class="form-control">
+    <form action="/login" method="POST">
+      <div class="form-group">
         <label for="email">E-Mail</label>
-        <input class="<%= validationErrors.find(e => e.param === 'email') ? 'invalid' : '' %>" type="email" name="email"
+        <input class="form-control <%= validationErrors.find(e => e.param === 'email') ? 'invalid' : '' %>" type="email" name="email"
           id="email" value="<%= oldInput.email==="@" ? '' : oldInput.email %>">
       </div>
-      <div class="form-control">
+      <div class="form-group">
         <label for="password">Password</label>
-        <input class="<%= validationErrors.find(e => e.param === 'password') ? 'invalid' : '' %>" type="password"
+        <input class="form-control <%= validationErrors.find(e => e.param === 'password') ? 'invalid' : '' %>" type="password"
           name="password" id="password" value="<%= oldInput.password %>">
       </div>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <button class="btn" type="submit">Login</button>
-      <a class="btn" href="/reset">Reset Password</a>
+      <button class="btn btn-primary" type="submit">Login</button>
+      <a class="btn btn-primary" href="/reset">Reset Password</a>
     </form>
   </main>
   <%- include('../includes/end.ejs') %>

@@ -2,7 +2,7 @@ require("dotenv").config();
 const stripe = require("stripe")(`${process.env.STRIPE_SECRET_KEY}`);
 const fs = require("fs");
 const path = require("path");
-const https = require("https");
+// const https = require("https");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -91,8 +91,8 @@ app.post("/webhook", (req, res, next) => {
 app.use(csrfProtection);
 app.use(flash());
 
-const privateKey = fs.readFileSync("server.key");
-const certificate = fs.readFileSync("server.cert");
+// const privateKey = fs.readFileSync("server.key");
+// const certificate = fs.readFileSync("server.cert");
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
@@ -144,15 +144,16 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    https
-      .createServer(
-        {
-          key: privateKey,
-          cert: certificate,
-        },
-        app
-      )
-      .listen(8080);
+    app.listen(8080);
+    // https
+    //   .createServer(
+    //     {
+    //       key: privateKey,
+    //       cert: certificate,
+    //     },
+    //     app
+    //   )
+    //   .listen(8080);
   })
   .catch((err) => {
     console.log(err);

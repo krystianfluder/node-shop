@@ -1,17 +1,23 @@
-<section class="pagination">
-  <% if (hasPrev) { %>
-  <% if (firstPage) { %>
-  <a href="?page=<%= firstPage %>"><%= firstPage %></a>
+<ul class="pagination">
+  <% if (hasPrev) { %> <% if (firstPage) { %>
+  <li class="page-item">
+    <a class="page-link" href="?page=<%= firstPage %>"><%= firstPage %></a>
+  </li>
   <% } %>
-  <a href="?page=<%= currentPage -1 %>">--</a>
+  <li class="page-item">
+    <a class="page-link" href="?page=<%= currentPage -1 %>">--</a>
+  </li>
   <% } %>
 
   <a class="active" href="?page=<%= currentPage %>"><%= currentPage %></a>
 
   <% if (hasNext) { %>
-  <a href="?page=<%= parseInt(currentPage) + 1 %>">--</a>
+  <li class="page-item">
+    <a class="page-link" href="?page=<%= parseInt(currentPage) + 1 %>">--</a>
+  </li>
   <% if (lastPage) { %>
-  <a href="?page=<%= lastPage %>"><%= lastPage %></a>
-  <% } %>
-  <% } %>
-</section>
+  <li class="page-item">
+    <a class="page-link" href="?page=<%= lastPage %>"><%= lastPage %></a>
+  </li>
+  <% } %> <% } %>
+</ul>
