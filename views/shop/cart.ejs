@@ -14,22 +14,29 @@
         </div>
         <div class="row mt-4">
             <% products.forEach(p => { %>
-            <div class="card" style="max-width: 18rem;">
-                <div class="card-body">
-                    <h3><%= p.productId.title %></h3>
-                    <p><%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %></p>
-                    <form action="/cart-delete-item" method="POST">
-                        <input type="hidden" value="<%= p.productId._id %>" name="productId">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                    </form>
+                <div class="card" style="width: 200px;">
+                    <img class="card-image-top" src="/<%= p.productId.imageUrlSmall %>" alt="<%= p.productId.title %>">
+                    <div class="card-body">
+                        <h2>
+                            <%= p.productId.title %>
+                          </h2>
+                          <p>$
+                            <%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %>
+                          </p>
+                          <div class="card-group d-flex justify-content-between">
+                          <form action="/cart-delete-item" method="POST">
+                            <input type="hidden" value="<%= p.productId._id %>" name="productId">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
             <% }) %>
         </div>
         <div class="row mt-4">
             <a class="btn btn-primary" href="/checkout">Go To Checkout!</a>
+            
         </div>
         
         <% } else { %>

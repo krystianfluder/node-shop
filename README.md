@@ -32,7 +32,7 @@ End. In the future you can add webhooks to your payment for convenience.
 1. clone
 2. add file .env
 3. set variables
-   `MONGO_CONNECT SESSION_SECRET SENDGRID_KEY STRIPE_PRIVATE_KEY STRIPE_SECRET_KEY`
+   `MONGO_CONNECT SESSION_SECRET SENDGRID_KEY STRIPE_SECRET_KEY - backend STRIPE_PUBLISHABLE_KEY - frontend`
 
 4. add server.key - private
 5. add server.cert - certificate

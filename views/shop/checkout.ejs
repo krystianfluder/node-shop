@@ -5,26 +5,38 @@
 
 <body>
   <%- include('../includes/navigation.ejs') %>
-  <main>
+  <main class="container">
     <% if (products.length > 0) { %>
-    <div class="card">
-      <div class="card__content">
-        <h1 class="centered">Total price: <%= totalPrice %></h1>
-        <h2>User data</h2>
-        <p>Email: <%= email %></p>
+    <div class="row">
+      <div class="col-lg-6">
+        <h1>Checkout</h1>
+        <h2>Total price: <%= totalPrice/100 %></h2>
+      </div>
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h3>User info</h3>
+          </div>
+          <div class="card-body">
+            email: <%= email %>
+          </div>
+        </div>
       </div>
     </div>
     <br>
-    <ul class="cart__item-list">
+    <div class="row">
       <% products.forEach(p => { %>
-      <li class="cart__item">
-        <h1><%= p.productId.title %></h1>
-        <p><%= p.productId.price %> * <%= p.quantity %> = <%= p.productId.price * p.quantity %></p>
-      </li>
+      <div class="card">
+        <div class="card-body">
+          <p><%= p.productId.title %></p>
+          <p><%= p.productId.price %> * <%= p.quantity %> = <%= p.productId.price * p.quantity %></p>
+        </div>
+      </div>
       <% }) %>
-    </ul>
-    <br>
-    <button id="order-btn" class="btn">ORDER</button>
+    </div>
+    <div class="row mt-4">
+      <button id="order-btn" class="btn btn-primary">ORDER</button>
+    </div>
     <!-- <form action="/checkout" method="POST">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn--center" type="submit">Submit Your Order</button>
@@ -36,7 +48,7 @@
   <%- include('../includes/end.ejs') %>
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-    var stripe = Stripe('<%= process.env.STRIPE_PUBLIC_KEY %>');
+    var stripe = Stripe('<%= process.env.STRIPE_PUBLISHABLE_KEY %>');
     var orderBtn = document.getElementById('order-btn');
     orderBtn.addEventListener('click', function() {
       stripe.redirectToCheckout({sessionId: '<%= sessionId %>'})

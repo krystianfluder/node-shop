@@ -1,4 +1,4 @@
-const stripe = require("stripe")(`${process.env.STRIPE_SECRET_KEY}`);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
@@ -78,6 +78,7 @@ exports.getProduct = (req, res, next) => {
     });
 };
 
+// fix empty - product does not exist
 exports.getCart = (req, res, next) => {
   req.profile
     .populate("cart.items.productId")
