@@ -20,6 +20,10 @@ const productSchema = Schema(
       type: String,
       required: true,
     },
+    imageUrlSmall: {
+      type: String,
+      required: true,
+    },
     profileId: {
       type: Schema.Types.ObjectId,
       ref: "Profile",

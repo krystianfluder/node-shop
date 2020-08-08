@@ -1,3 +1,5 @@
+const { v4 } = require("uuid");
+const sharp = require("sharp");
 const Product = require("../models/product");
 const { validationResult } = require("express-validator");
 const fileHelper = require("../util/file");
@@ -49,9 +51,19 @@ exports.postAddProduct = (req, res, next) => {
   if (!errors.isEmpty()) return response(errors.array()[0].msg, errors.array());
   if (!req.file) return response("Image", []);
 
+  const pathTab = req.file.path.split("/");
+  const filename = pathTab[pathTab.length - 1];
+
+  sharp(req.file.path)
+    .resize(200, 200)
+    .toFile(`images/small-${filename}`, (err, info) => {
+      console.log(err, info);
+    });
+
   const product = new Product({
     title,
     imageUrl: req.file.path,
+    imageUrlSmall: `images/small-${filename}`,
     price,
     description,
     profileId: req.profile,

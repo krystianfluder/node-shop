@@ -7,10 +7,12 @@
     <%- include('../includes/navigation.ejs') %>
 
     <main class="container">
+        <h1 class="mb-4"><%= editing ? "Edit product" : "Add product" %></h1>
         <% if (errorMessage) { %>
-        <div class="profile-message profile-message--error"><%= errorMessage %></div>
+        <div class="alert alert-primary"><%= errorMessage %></div>
         <% } %>
         <form
+            class="mt-4"
             method="POST"
             enctype="multipart/form-data"
             action='/admin/<%= editing ? "edit-product" : "add-product" %>?_csrf=<%= csrfToken %>'

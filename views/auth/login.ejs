@@ -6,11 +6,12 @@
 <body>
   <%- include('../includes/navigation.ejs') %>
 
-  <main>
+  <main class="container">
+    <h1 class="mb-4">Login</h1>
     <% if (errorMessage) { %>
       <div class="alert alert-primary"><%= errorMessage %></div>
      <% } %>
-    <form action="/login" method="POST">
+    <form class="mt-4" action="/login" method="POST">
       <div class="form-group">
         <label for="email">E-Mail</label>
         <input class="form-control <%= validationErrors.find(e => e.param === 'email') ? 'invalid' : '' %>" type="email" name="email"
@@ -23,7 +24,7 @@
       </div>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn-primary" type="submit">Login</button>
-      <a class="btn btn-primary" href="/reset">Reset Password</a>
+      <a class="btn btn-link" href="/reset">Reset Password</a>
     </form>
   </main>
   <%- include('../includes/end.ejs') %>

@@ -6,17 +6,18 @@
 <body>
   <%- include('../includes/navigation.ejs') %>
 
-  <main>
+  <main class="container">
+    <h1 class="mb-4">Reset your password</h1>
     <% if (errorMessage) { %>
-    <div class="profile-message profile-message--error"><%= errorMessage %></div>
+    <div class="alert alert-primary"><%= errorMessage %></div>
     <% } %>
-    <form class="login-form" action="/reset" method="POST">
-      <div class="form-control">
+    <form class="mt-4" action="/reset" method="POST">
+      <div class="form-group">
         <label for="email">E-Mail</label>
-        <input type="email" name="email" id="email" value="">
+        <input class="form-control" type="email" name="email" id="email" value="">
       </div>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <button class="btn" type="submit">Reset password</button>
+      <button class="btn btn-primary" type="submit">Reset password</button>
     </form>
   </main>
   <%- include('../includes/end.ejs') %>

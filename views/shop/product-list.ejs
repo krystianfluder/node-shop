@@ -5,12 +5,14 @@
 <body>
   <%- include('../includes/navigation.ejs') %>
   <main class="container">
-    <h1>Products</h1>
-    <% if (prods.length > 0) { %>
     <div class="row">
+      <h1>Products</h1>
+    </div>
+    <% if (prods.length > 0) { %>
+    <div class="row mt-4">
       <% for (let product of prods) { %>
-        <div class="card">
-          <img class="card-image-top" src="/<%= product.imageUrl %>" alt="<%= product.title %>">
+        <div class="card" style="width: 200px;">
+          <img class="card-image-top" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
           <div class="card-body">
             <h2>
               <%= product.title %>
@@ -18,13 +20,12 @@
             <p>$
               <%= product.price/100 %>
             </p>
-            <p">
-              <%= product.description %>
-            </p>
+            <div class="card-group d-flex justify-content-between">
             <a href="/products/<%= product._id %>" class="btn btn-primary">Details</a>
             <% if (isAuthenticated) { %>
               <%- include('../includes/add-to-cart.ejs', {product: product}) %>
             <% } %>
+            </div>
           </div>
         </div>
     <% } %>

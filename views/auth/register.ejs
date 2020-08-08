@@ -6,11 +6,12 @@
 <body>
   <%- include('../includes/navigation.ejs') %>
 
-  <main>
+  <main class="container">
+    <h1 class="mb-4">Register</h1>
     <% if (errorMessage) { %>
       <div class="alert alert-primary"><%= errorMessage %></div>
     <% } %>
-    <form action="/register" method="POST" novalidate>
+    <form class="mt-4" action="/register" method="POST" novalidate>
       <div class="form-group">
         <label for="email">E-Mail</label>
         <input class="form-control <%= validationErrors.find(e => e.param === 'email' || e.param === '@') ? 'invalid' : '' %>"
