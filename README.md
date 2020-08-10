@@ -1,5 +1,13 @@
 # node-shop
 
+# todo
+
+- fix payments (orders)
+- order paid, complete etc
+- webhook!!
+- improve design
+- add animations
+
 ## Table of Contents
 
 - [General info](#general-info)

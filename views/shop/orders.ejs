@@ -1,5 +1,4 @@
 <%- include('../includes/head.ejs') %>
-<link rel="stylesheet" href="/css/orders.css">
 </head>
 
 <body>
@@ -8,17 +7,20 @@
         <% if (orders.length <= 0) { %>
         <h1>Nothing there!</h1>
         <% } else { %>
-        <ul class="orders">
+        <ul class="list-group">
             <% orders.forEach(order => { %>
-            <li class="orders__item">
-                <h1>Order - # <%= order._id %></h1>
-                <a href="/orders/<%= order._id %>">Download</a>
-                <ul class="orders__products">
-                    <% order.products.forEach(p => { %>
-                    <li class="orders__products-item"><%= p.product.title %> (<%= p.quantity %>)</li>
-                    <% }); %>
-                </ul>
-            </li>
+                <li class="list-group-item">
+                    <h2>Id: <%= order._id %></h1>
+                    <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
+                    <ul class="list-group">
+                        <% order.products.forEach(p => { %>
+                        <li class="list-group-item d-flex align-items-center">
+                            <a class="btn btn-link" href="/products/<%= p.product._id %>"><%= p.product.title %></a>
+                            <div><%= p.product.price/100 %> € * <%= p.quantity %> = <%= (p.product.price/100) * p.quantity %> </div>
+                        </li>
+                        <% }); %>
+                    </ul>
+                </li>
             <% }); %>
         </ul>
         <% } %>

@@ -1,9 +1,8 @@
-const path = require("path");
-
 const express = require("express");
 
 const shopController = require("../controllers/shop");
 const isAuth = require("../middleware/is-auth");
+const { catchAsync } = require("../middleware/errors");
 
 const router = express.Router();
 
@@ -29,6 +28,6 @@ router.get("/checkout/success", isAuth, shopController.getCheckoutSuccess);
 
 router.get("/checkout/cancel", isAuth, shopController.getCheckout);
 
-router.post("/checkout", isAuth, shopController.postCheckout);
+router.post("/checkout", isAuth, catchAsync(shopController.postCheckout));
 
 module.exports = router;

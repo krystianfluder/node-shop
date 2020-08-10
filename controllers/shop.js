@@ -2,11 +2,9 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
-const sgMail = require("@sendgrid/mail");
 const Product = require("../models/product");
 const Order = require("../models/order");
-
-sgMail.setApiKey(process.env.SENDGRID_KEY);
+const { transporter } = require("../config/mails");
 
 const ITEMS_PER_PAGE = 2;
 
@@ -134,6 +132,9 @@ exports.postCartDeleteProduct = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   Order.find({ "profile.profileId": req.profile._id })
     .then((orders) => {
+      orders.forEach((order) => {
+        console.log(order.products);
+      });
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
@@ -159,10 +160,17 @@ exports.getInvoice = (req, res, next) => {
       }
       const invoiceName = `invoice-${orderId}.pdf`;
       const invoicePath = path.join("data", "invoices", invoiceName);
-      const file = fs.createReadStream(invoicePath);
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
-      file.pipe(res);
+
+      fs.access(invoicePath, fs.F_OK, (err) => {
+        if (err) {
+          console.error(err);
+          return next(new Error("Not found pdf file"));
+        }
+        const file = fs.createReadStream(invoicePath);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
+        file.pipe(res);
+      });
     })
     .catch((err) => {
       const error = new Error(err);
@@ -185,21 +193,6 @@ exports.getCheckout = (req, res, next) => {
         totalPrice += p.quantity * p.productId.price;
       });
       email = profile.email;
-
-      return stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: products.map((p) => {
-          return {
-            name: p.productId.title,
-            description: p.productId.description,
-            amount: p.productId.price,
-            currency: "eur",
-            quantity: p.quantity,
-          };
-        }),
-        success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
-        cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
-      });
     })
     .then((session) => {
       res.render("shop/checkout", {
@@ -208,7 +201,7 @@ exports.getCheckout = (req, res, next) => {
         products,
         email,
         totalPrice,
-        sessionId: session.id,
+        // sessionId: session.id,
       });
     })
     .catch((err) => {
@@ -219,119 +212,160 @@ exports.getCheckout = (req, res, next) => {
 };
 
 exports.getCheckoutSuccess = (req, res, next) => {
-  req.profile
-    .populate("cart.items.productId")
-    .execPopulate()
-    .then((profile) => {
-      const products = profile.cart.items.map((i) => {
-        return {
-          quantity: i.quantity,
-          product: { ...i.productId._doc },
-        };
-      });
-      const order = new Order({
-        profile: {
-          profileId: req.profile._id,
-        },
-        products,
-      });
-      return order.save();
-    })
-    .then((order) => {
-      return order;
-    })
-    .then((order) => {
-      const doc = new PDFDocument();
-      doc.pipe(fs.createWriteStream(`data/invoices/invoice-${order._id}.pdf`));
-      doc.text(`Thank you! ${req.profile.email}`);
-      doc.text(`Date of order: ${order.createdAt}`);
-      doc.text("Products: ");
-      let totalPrice = 0;
-      order.products.forEach((product) => {
-        const price = product.product.price * product.quantity;
-        totalPrice += price;
-        doc.text(
-          `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
-        );
-        doc.image(product.product.imageUrl, {
-          fit: [200, 200],
-          align: "left",
-        });
-      });
-      doc.text(`Total price: ${totalPrice}`);
-      doc.end();
-      req.profile.clearCart();
-      res.redirect("/orders");
-      const msg = {
-        to: req.profile.email,
-        from: "test@example.com",
-        subject: "Thank you for order",
-        html: `<strong><a href="${process.env.BASE_URL}/orders/${order._id}">Invoice</a></strong>`,
-      };
-      sgMail.send(msg);
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
-    });
+  // req.profile
+  //   .populate("cart.items.productId")
+  //   .execPopulate()
+  //   .then((profile) => {
+  //     const products = profile.cart.items.map((i) => {
+  //       return {
+  //         quantity: i.quantity,
+  //         product: { ...i.productId._doc },
+  //       };
+  //     });
+  //     const order = new Order({
+  //       profile: {
+  //         profileId: req.profile._id,
+  //       },
+  //       products,
+  //     });
+  //     return order.save();
+  //   })
+  //   .then((order) => {
+  //     return order;
+  //   })
+  //   .then((order) => {
+  //     const doc = new PDFDocument();
+  //     doc.pipe(fs.createWriteStream(`data/invoices/invoice-${order._id}.pdf`));
+  //     doc.text(`Thank you! ${req.profile.email}`);
+  //     doc.text(`Date of order: ${order.createdAt}`);
+  //     doc.text("Products: ");
+  //     let totalPrice = 0;
+  //     order.products.forEach((product) => {
+  //       const price = product.product.price * product.quantity;
+  //       totalPrice += price;
+  //       doc.text(
+  //         `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
+  //       );
+  //       doc.image(product.product.imageUrl, {
+  //         fit: [200, 200],
+  //         align: "left",
+  //       });
+  //     });
+  //     doc.text(`Total price: ${totalPrice}`);
+  //     doc.end();
+  //     req.profile.clearCart();
+  //     res.redirect("/orders");
+  //     const msg = {
+  //       to: req.profile.email,
+  //       from: "test@example.com",
+  //       subject: "Thank you for order",
+  //       html: `<strong><a href="${process.env.BASE_URL}/orders/${order._id}">Invoice</a></strong>`,
+  //     };
+  //     sgMail.send(msg);
+  //   })
+  //   .catch((err) => {
+  //     const error = new Error(err);
+  //     error.status = 500;
+  //     return next(error);
+  //   });
 };
 
-exports.postCheckout = (req, res, next) => {
-  req.profile
-    .populate("cart.items.productId")
-    .execPopulate()
-    .then((profile) => {
-      const products = profile.cart.items.map((i) => {
-        return {
-          quantity: i.quantity,
-          product: { ...i.productId._doc },
-        };
-      });
-      const order = new Order({
-        profile: {
-          profileId: req.profile._id,
+exports.postCheckout = async (req, res, next) => {
+  const { profile } = req;
+  await profile.populate("cart.items.productId").execPopulate();
+
+  let totalPrice = 0;
+
+  const products = profile.cart.items.map((i) => {
+    return {
+      quantity: i.quantity,
+      product: { ...i.productId._doc },
+    };
+  });
+
+  const lineItems = [];
+
+  products.forEach((p) => {
+    totalPrice += p.quantity * p.product.price;
+    lineItems.push({
+      price_data: {
+        currency: "eur",
+        product_data: {
+          name: p.product.title,
+          description: p.product.description,
         },
-        products,
-      });
-      return order.save();
-    })
-    .then((order) => {
-      return order;
-    })
-    .then((order) => {
-      const doc = new PDFDocument();
-      doc.pipe(fs.createWriteStream(`data/invoices/invoice-${order._id}.pdf`));
-      doc.text(`Thank you! ${req.profile.email}`);
-      doc.text(`Date of order: ${order.createdAt}`);
-      doc.text("Products: ");
-      let totalPrice = 0;
-      order.products.forEach((product) => {
-        const price = product.product.price * product.quantity;
-        totalPrice += price;
-        doc.text(
-          `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
-        );
-        doc.image(product.product.imageUrl, {
-          fit: [200, 200],
-          align: "left",
-        });
-      });
-      doc.text(`Total price: ${totalPrice}`);
-      doc.end();
-      req.profile.clearCart();
-      res.redirect("/orders");
-      const msg = {
-        to: req.profile.email,
-        from: "test@example.com",
-        subject: "Thank you for order",
-        html: `<strong><a href="${process.env.BASE_URL}/orders/${order._id}">Invoice</a></strong>`,
-      };
-      sgMail.send(msg);
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+        unit_amount: p.product.price,
+      },
+      quantity: p.quantity,
     });
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    customer_email: profile.email,
+    payment_method_types: ["card"],
+    line_items: lineItems,
+    mode: "payment",
+    success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
+    cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
+  });
+
+  const order = new Order({
+    profile: {
+      profileId: req.profile._id,
+    },
+    products,
+    paid: false,
+    session,
+    totalPrice,
+  });
+
+  await order.save();
+
+  const doc = new PDFDocument();
+  const writeStream = fs.createWriteStream(
+    `data/invoices/invoice-${order._id}.pdf`
+  );
+  doc.pipe(writeStream);
+  doc.text(`Thank you! ${req.profile.email}`);
+  doc.text(`Date of order: ${order.createdAt}`);
+  doc.text("Products: ");
+
+  products.forEach((product) => {
+    const price = product.product.title * product.quantity;
+    doc.text(
+      `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
+    );
+    doc.image(product.product.imageUrl, {
+      fit: [200, 200],
+      align: "left",
+    });
+  });
+  doc.text(`Total price: ${totalPrice}`);
+  doc.end();
+
+  writeStream.on("finish", async () => {
+    await transporter.sendMail({
+      from: "test@test.com",
+      to: profile.email,
+      subject: "invoice ✔", // Subject line
+      // text: "", // plain text body
+      html: `<b>HTML</b>`, // html
+      attachments: [
+        {
+          filename: `invoice.pdf`,
+          path: path.join(
+            __dirname,
+            "../data/invoices",
+            `invoice-${order._id}.pdf`
+          ),
+          contentType: "application/pdf",
+        },
+      ],
+    });
+  });
+
+  res.json({
+    message: "Order created",
+    session,
+  });
 };

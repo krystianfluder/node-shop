@@ -3,28 +3,41 @@ const { Schema } = mongoose;
 
 const orderSchema = new Schema(
   {
+    paid: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     products: [
       {
         product: {
           type: Object,
-          required: true
+          required: true,
         },
         quantity: {
           type: Number,
-          required: true
-        }
-      }
+          required: true,
+        },
+      },
     ],
     profile: {
       profileId: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: "Profile"
-      }
-    }
+        ref: "Profile",
+      },
+    },
+    session: {
+      type: Object,
+      required: true,
+    },
+    totalPrice: {
+      type: Number,
+      required: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
