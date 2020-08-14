@@ -29,6 +29,7 @@ const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const v1Routes = require("./routes/v1");
+const { getBreadcrumbs } = require("./util/breadcrumbs");
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, "access.log"),
@@ -46,6 +47,7 @@ app.use(
 );
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static("public"));
 app.use("/images", express.static("images"));
 
@@ -71,6 +73,7 @@ app.use(flash());
 // const certificate = fs.readFileSync("server.cert");
 
 app.use((req, res, next) => {
+  res.locals.breadcrumbs = getBreadcrumbs(req.url);
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.isAdmin = req.session.isAdmin;
   res.locals.csrfToken = req.csrfToken();

@@ -7,11 +7,10 @@
   <%- include('../includes/navigation.ejs') %>
 
   <main class="container">
-    <h1 class="mb-4">Register</h1>
-    <% if (errorMessage) { %>
-      <div class="alert alert-primary"><%= errorMessage %></div>
-    <% } %>
-    <form class="mt-4" action="/register" method="POST" novalidate>
+    <%- include('../includes/breadcrumbs-and-header.ejs') %>
+    <%- include('../includes/error-message.ejs') %>
+
+    <form action="/register" method="POST" novalidate>
       <div class="form-group">
         <label for="email">E-Mail</label>
         <input class="form-control <%= validationErrors.find(e => e.param === 'email' || e.param === '@') ? 'invalid' : '' %>"
@@ -20,15 +19,16 @@
       <div class="form-group">
         <label for="password">Password</label>
         <input class="form-control <%= validationErrors.find(e => e.param === 'password') ? 'invalid' : '' %>" type="password"
-          name="password" id="password" value="<%= oldInput.password %>">
+        name="password" id="password" value="<%= oldInput.password %>">
       </div>
       <div class="form-group">
         <label for="password2">Confirm Password</label>
         <input class="form-control <%= validationErrors.find(e => e.param === 'password2') ? 'invalid' : '' %>" type="password"
-          name="password2" id="password2" value="<%= oldInput.password2 %>">
+        name="password2" id="password2" value="<%= oldInput.password2 %>">
       </div>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn-primary" type="submit">Register</button>
     </form>
+    
   </main>
   <%- include('../includes/end.ejs') %>

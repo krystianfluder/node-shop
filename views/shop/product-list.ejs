@@ -5,11 +5,11 @@
 <body>
   <%- include('../includes/navigation.ejs') %>
   <main class="container">
-    <div class="row">
-      <h1>Products</h1>
-    </div>
+    <%- include('../includes/breadcrumbs-and-header.ejs') %>
+    
     <% if (prods.length > 0) { %>
-    <div class="row mt-4">
+
+    <div class="d-flex">
       <% for (let product of prods) { %>
         <div class="card" style="width: 200px;">
           <img class="card-image-top" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
@@ -28,10 +28,12 @@
             </div>
           </div>
         </div>
-    <% } %>
+      <% } %>
     </div>
+
     <% } else { %>
     <h1>No Products Found!</h1>
     <% } %>
+    
   </main>
   <%- include('../includes/end.ejs') %>

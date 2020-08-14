@@ -7,11 +7,9 @@
   <%- include('../includes/navigation.ejs') %>
 
   <main class="container">
-    <h1 class="mb-4">Reset your password</h1>
-    <% if (errorMessage) { %>
-    <div class="alert alert-primary"><%= errorMessage %></div>
-    <% } %>
-    <form class="mt-4" action="/reset" method="POST">
+    <%- include('../includes/breadcrumbs-and-header.ejs') %>
+    <%- include('../includes/error-message.ejs') %>
+    <form action="/reset" method="POST">
       <div class="form-group">
         <label for="email">E-Mail</label>
         <input class="form-control" type="email" name="email" id="email" value="">
@@ -19,5 +17,6 @@
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn-primary" type="submit">Reset password</button>
     </form>
+
   </main>
   <%- include('../includes/end.ejs') %>

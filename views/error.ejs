@@ -3,7 +3,9 @@
 
 <body>
   <%- include('includes/navigation.ejs') %>
-  <h1>Status: <%= status %></h1>
-  <h1>Status: <%= message %></h1>
-
+  <main class="container">
+    <%- include('includes/breadcrumbs-and-header.ejs') %>
+    <h2>Status: <%= status %></h1>
+    <h3>Message: <%= message %></h3>
+  </main> 
   <%- include('includes/end.ejs') %>

@@ -1,0 +1,14 @@
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb w-100">
+      <ol class="breadcrumb">
+        <% for (let breadcrumb of breadcrumbs) { %>
+        <li class="breadcrumb-item">
+          <a href="<%= breadcrumb.slug %>"><%= breadcrumb.name %></a>
+        </li>
+        <% } %>
+      </ol>
+    </nav>
+    <h1 class="w-100"><%= pageTitle %></h1>
+  </div>
+</div>

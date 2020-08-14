@@ -61,10 +61,8 @@ profileSchema.methods.addToCart = function (product) {
 
 profileSchema.methods.removeFromCart = function (productId) {
   const updatedCartItems = this.cart.items.filter((item) => {
-    console.log("itemmmmmmmmmmmmmm", item, productId);
     return item.productId.toString() !== productId.toString();
   });
-  console.log(updatedCartItems);
 
   this.cart.items = updatedCartItems;
   return this.save();

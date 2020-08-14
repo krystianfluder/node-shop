@@ -1,11 +1,11 @@
 <%- include('../includes/head.ejs') %>
-<link rel="stylesheet" href="/css/cart.css">
 <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body>
   <%- include('../includes/navigation.ejs') %>
   <main class="container">
+    <%- include('../includes/breadcrumbs-and-header.ejs') %>
     <% if (products.length > 0) { %>
     <div class="row">
       <div class="col-lg-6">
@@ -36,30 +36,45 @@
     </div>
     <div class="row mt-4">
       <button id="order-btn" class="btn btn-primary">ORDER</button>
+      <form action="/checkout" method="post">
+        <button class="btn btn-primary" type="submit">Add to Cart</button>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input type="text" name="test" value="test">
+      </form>
+      
     </div>
-    <!-- <form action="/checkout" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <button class="btn btn--center" type="submit">Submit Your Order</button>
-    </form> -->
     <% } else { %>
     <h1>No Products in Cart!</h1>
     <% } %>
   </main>
   <%- include('../includes/end.ejs') %>
   <script src="https://js.stripe.com/v3/"></script>
+  <script src="ejs.min.js"></script>
   <script>
     var stripe = Stripe('<%= process.env.STRIPE_PUBLISHABLE_KEY %>');
     var orderBtn = document.getElementById('order-btn');
-    orderBtn.addEventListener('click', function() {
-      fetch('http://localhost:8080/checkout', {
-        method: "POST",
-        headers: {
-          'X-CSRF-TOKEN': "<%= csrfToken %>"
-        },
-      }).then(res => res.json()).then(res => {
-        if (res.message === "Order created") {
-          stripe.redirectToCheckout({sessionId: res.session.id})
-        }
-      })      
-    })
+
+    var products2 = "<%# products2 %>";
+    console.log(products2)
+
+      orderBtn.addEventListener('click', function() {
+        fetch('/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '<%= csrfToken %>'
+          },
+          body: JSON.stringify({
+            cart: []
+          })          
+          
+        }).then(res => res.json()).then(res => {
+          // console.log(res)
+          // if (res.message === "Order created") {
+          //   return stripe.redirectToCheckout({sessionId: res.session.id})
+          // }
+        })      
+      })
+    
+   
   </script>

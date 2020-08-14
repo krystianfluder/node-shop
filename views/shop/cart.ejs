@@ -5,42 +5,39 @@
 <body>
     <%- include('../includes/navigation.ejs') %>
     <main class="container">
-        <% if (products.length > 0) { %>
-        <div class="row">
-            <div class="col-lg-6">
-                <h1>Cart</h1>
-                <h2>Total price: <%= totalPrice/100 %></h2>
+      <%- include('../includes/breadcrumbs-and-header.ejs') %>
+      <% if (products.length > 0) { %>
+
+      <h2 class="mb-4">Total price: <%= totalPrice/100 %></h2>
+
+      <div class="d-flex mb-4">        
+        <% products.forEach(p => { %>
+          <div class="card" style="width: 200px;">
+            <img class="card-image-top" src="/<%= p.productId.imageUrlSmall %>" alt="<%= p.productId.title %>">
+            <div class="card-body">
+              <h2>
+                <%= p.productId.title %>
+              </h2>
+              <p>$
+                <%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %>
+              </p>
+              <div class="card-group d-flex justify-content-between">
+                <form action="/cart-delete-item" method="POST">
+                  <input type="hidden" value="<%= p.productId._id %>" name="productId">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="btn btn-danger" type="submit">Delete</button>
+                </form>
+              </div>
             </div>
-        </div>
-        <div class="row mt-4">
-            <% products.forEach(p => { %>
-                <div class="card" style="width: 200px;">
-                    <img class="card-image-top" src="/<%= p.productId.imageUrlSmall %>" alt="<%= p.productId.title %>">
-                    <div class="card-body">
-                        <h2>
-                            <%= p.productId.title %>
-                          </h2>
-                          <p>$
-                            <%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %>
-                          </p>
-                          <div class="card-group d-flex justify-content-between">
-                          <form action="/cart-delete-item" method="POST">
-                            <input type="hidden" value="<%= p.productId._id %>" name="productId">
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <button class="btn btn-danger" type="submit">Delete</button>
-                        </form>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
-        </div>
-        <div class="row mt-4">
-            <a class="btn btn-primary" href="/checkout">Go To Checkout!</a>
-            
-        </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <a class="btn btn-primary" href="/checkout">Go To Checkout!</a>
         
-        <% } else { %>
+      <% } else { %>
         <h1>No Products in Cart!</h1>
-        <% } %>
+      <% } %>
+
     </main>
     <%- include('../includes/end.ejs') %>

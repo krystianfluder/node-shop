@@ -103,6 +103,7 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
+
   Product.findById(prodId)
     .then((product) => {
       req.profile.addToCart(product);
@@ -132,9 +133,6 @@ exports.postCartDeleteProduct = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   Order.find({ "profile.profileId": req.profile._id })
     .then((orders) => {
-      orders.forEach((order) => {
-        console.log(order.products);
-      });
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
@@ -179,36 +177,25 @@ exports.getInvoice = (req, res, next) => {
     });
 };
 
-exports.getCheckout = (req, res, next) => {
-  let products;
+exports.getCheckout = async (req, res, next) => {
+  const { profile } = req;
+  await profile.populate("cart.items.productId").execPopulate();
+
   let totalPrice = 0;
-  let email;
-  req.profile
-    .populate("cart.items.productId")
-    .execPopulate()
-    .then((profile) => {
-      products = profile.cart.items;
-      totalPrice = 0;
-      products.forEach((p) => {
-        totalPrice += p.quantity * p.productId.price;
-      });
-      email = profile.email;
-    })
-    .then((session) => {
-      res.render("shop/checkout", {
-        path: "/checkout",
-        pageTitle: "Checkout",
-        products,
-        email,
-        totalPrice,
-        // sessionId: session.id,
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
-    });
+  const products = profile.cart.items;
+
+  products.forEach((p) => {
+    totalPrice += p.quantity * p.productId.price;
+  });
+
+  res.render("shop/checkout", {
+    path: "/checkout",
+    pageTitle: "Checkout",
+    products: products,
+    products2: products,
+    email: profile.email,
+    totalPrice,
+  });
 };
 
 exports.getCheckoutSuccess = (req, res, next) => {
@@ -271,101 +258,103 @@ exports.getCheckoutSuccess = (req, res, next) => {
 };
 
 exports.postCheckout = async (req, res, next) => {
-  const { profile } = req;
-  await profile.populate("cart.items.productId").execPopulate();
-
-  let totalPrice = 0;
-
-  const products = profile.cart.items.map((i) => {
-    return {
-      quantity: i.quantity,
-      product: { ...i.productId._doc },
-    };
-  });
-
-  const lineItems = [];
-
-  products.forEach((p) => {
-    totalPrice += p.quantity * p.product.price;
-    lineItems.push({
-      price_data: {
-        currency: "eur",
-        product_data: {
-          name: p.product.title,
-          description: p.product.description,
-        },
-        unit_amount: p.product.price,
-      },
-      quantity: p.quantity,
-    });
-  });
-
-  const session = await stripe.checkout.sessions.create({
-    customer_email: profile.email,
-    payment_method_types: ["card"],
-    line_items: lineItems,
-    mode: "payment",
-    success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
-    cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
-  });
-
-  const order = new Order({
-    profile: {
-      profileId: req.profile._id,
-    },
-    products,
-    paid: false,
-    session,
-    totalPrice,
-  });
-
-  await order.save();
-
-  const doc = new PDFDocument();
-  const writeStream = fs.createWriteStream(
-    `data/invoices/invoice-${order._id}.pdf`
-  );
-  doc.pipe(writeStream);
-  doc.text(`Thank you! ${req.profile.email}`);
-  doc.text(`Date of order: ${order.createdAt}`);
-  doc.text("Products: ");
-
-  products.forEach((product) => {
-    const price = product.product.title * product.quantity;
-    doc.text(
-      `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
-    );
-    doc.image(product.product.imageUrl, {
-      fit: [200, 200],
-      align: "left",
-    });
-  });
-  doc.text(`Total price: ${totalPrice}`);
-  doc.end();
-
-  writeStream.on("finish", async () => {
-    await transporter.sendMail({
-      from: "test@test.com",
-      to: profile.email,
-      subject: "invoice ✔", // Subject line
-      // text: "", // plain text body
-      html: `<b>HTML</b>`, // html
-      attachments: [
-        {
-          filename: `invoice.pdf`,
-          path: path.join(
-            __dirname,
-            "../data/invoices",
-            `invoice-${order._id}.pdf`
-          ),
-          contentType: "application/pdf",
-        },
-      ],
-    });
-  });
+  console.log(req.body);
 
   res.json({
     message: "Order created",
-    session,
+    test: "",
+    // session,
   });
+  // const { profile } = req;
+  // await profile.populate("cart.items.productId").execPopulate();
+
+  // let totalPrice = 0;
+
+  // const products = profile.cart.items.map((i) => {
+  //   return {
+  //     quantity: i.quantity,
+  //     product: { ...i.productId._doc },
+  //   };
+  // });
+
+  // const lineItems = [];
+
+  // products.forEach((p) => {
+  //   totalPrice += p.quantity * p.product.price;
+  //   lineItems.push({
+  //     price_data: {
+  //       currency: "eur",
+  //       product_data: {
+  //         name: p.product.title,
+  //         description: p.product.description,
+  //       },
+  //       unit_amount: p.product.price,
+  //     },
+  //     quantity: p.quantity,
+  //   });
+  // });
+
+  // const session = await stripe.checkout.sessions.create({
+  //   customer_email: profile.email,
+  //   payment_method_types: ["card"],
+  //   line_items: lineItems,
+  //   mode: "payment",
+  //   success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
+  //   cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
+  // });
+
+  // const order = new Order({
+  //   profile: {
+  //     profileId: req.profile._id,
+  //   },
+  //   products,
+  //   paid: false,
+  //   session,
+  //   totalPrice,
+  // });
+
+  // await order.save();
+
+  // const doc = new PDFDocument();
+  // const writeStream = fs.createWriteStream(
+  //   `data/invoices/invoice-${order._id}.pdf`
+  // );
+  // doc.pipe(writeStream);
+  // doc.text(`Thank you! ${req.profile.email}`);
+  // doc.text(`Date of order: ${order.createdAt}`);
+  // doc.text("Products: ");
+
+  // products.forEach((product) => {
+  //   const price = product.product.price * product.quantity;
+  //   doc.text(
+  //     `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
+  //   );
+  //   doc.image(product.product.imageUrl, {
+  //     fit: [200, 200],
+  //     align: "left",
+  //   });
+  // });
+  // doc.text(`Total price: ${totalPrice}`);
+  // doc.end();
+
+  // writeStream.on("finish", async () => {
+  //   await transporter.sendMail({
+  //     from: "test@test.com",
+  //     to: profile.email,
+  //     subject: "invoice ✔", // Subject line
+  //     // text: "", // plain text body
+  //     html: `<b>HTML</b>`, // html
+  //     attachments: [
+  //       {
+  //         filename: `invoice.pdf`,
+  //         path: path.join(
+  //           __dirname,
+  //           "../data/invoices",
+  //           `invoice-${order._id}.pdf`
+  //         ),
+  //         contentType: "application/pdf",
+  //       },
+  //     ],
+  //   });
+  // });
 };

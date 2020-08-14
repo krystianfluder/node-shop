@@ -2,27 +2,34 @@
 </head>
 
 <body>
-    <%- include('../includes/navigation.ejs') %>
-    <main class="container">
-        <% if (orders.length <= 0) { %>
-        <h1>Nothing there!</h1>
-        <% } else { %>
-        <ul class="list-group">
-            <% orders.forEach(order => { %>
-                <li class="list-group-item">
-                    <h2>Id: <%= order._id %></h1>
-                    <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
-                    <ul class="list-group">
-                        <% order.products.forEach(p => { %>
-                        <li class="list-group-item d-flex align-items-center">
-                            <a class="btn btn-link" href="/products/<%= p.product._id %>"><%= p.product.title %></a>
-                            <div><%= p.product.price/100 %> € * <%= p.quantity %> = <%= (p.product.price/100) * p.quantity %> </div>
-                        </li>
-                        <% }); %>
-                    </ul>
-                </li>
-            <% }); %>
-        </ul>
-        <% } %>
-    </main>
-    <%- include('../includes/end.ejs') %>
+  <%- include('../includes/navigation.ejs') %>
+  <main class="container">
+    <%- include('../includes/breadcrumbs-and-header.ejs') %>
+
+    <% if (orders.length <= 0) { %>
+
+      <h1>Nothing there!</h1>      
+      
+    <% } else { %>
+
+    <ul class="list-group">
+      <% orders.forEach(order => { %>
+      <li class="list-group-item">
+      <h2>Id: <%= order._id %></h1>
+      <p>Total price: <%= order.totalPrice/100 %> €</p>
+      Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
+      <ul class="list-group">
+        <% order.products.forEach(p => { %>
+        <li class="list-group-item d-flex align-items-center">
+          <a class="btn btn-link" href="/products/<%= p.product._id %>"><%= p.product.title %></a>
+          <div><%= p.product.price/100 %> € * <%= p.quantity %> = <%= (p.product.price/100) * p.quantity %> </div>
+        </li>
+        <% }); %>
+      </ul>
+      </li>
+      <% }); %>
+    </ul>
+
+    <% } %>
+  </main>
+  <%- include('../includes/end.ejs') %>
