@@ -26,9 +26,17 @@ router.get("/orders/:orderId", isAuth, shopController.getInvoice);
 
 router.get("/checkout", isAuth, catchAsync(shopController.getCheckout));
 
-router.get("/checkout/success", isAuth, shopController.getCheckoutSuccess);
+router.get(
+  "/checkout/success",
+  isAuth,
+  catchAsync(shopController.getCheckoutSuccess)
+);
 
-router.get("/checkout/cancel", isAuth, shopController.getCheckout);
+router.get(
+  "/checkout/cancel",
+  isAuth,
+  catchAsync(shopController.getCheckoutCancel)
+);
 
 router.post("/checkout", isAuth, catchAsync(shopController.postCheckout));
 

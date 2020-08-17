@@ -5,7 +5,8 @@ const PDFDocument = require("pdfkit");
 const Product = require("../models/product");
 const Order = require("../models/order");
 const { transporter } = require("../config/mails");
-const ITEMS_PER_PAGE = 2;
+
+const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
 
 exports.getIndex = (req, res, next) => {
   let page = req.query.page;
@@ -165,10 +166,10 @@ exports.getOrders = (req, res, next) => {
       return Order.find()
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE)
+        .select("createdAt totalPrice products")
         .lean();
     })
     .then((orders) => {
-      console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
@@ -181,15 +182,6 @@ exports.getOrders = (req, res, next) => {
         lastPage: Math.ceil(totalOrders / ITEMS_PER_PAGE),
       });
     })
-
-    // Order.find({ "profile.profileId": req.profile._id })
-    //   .then((orders) => {
-    //     res.render("shop/orders", {
-    //       path: "/orders",
-    //       pageTitle: "Orders",
-    //       orders,
-    //     });
-    //   })
     .catch((err) => {
       const error = new Error(err);
       error.status = 500;
@@ -200,6 +192,8 @@ exports.getOrders = (req, res, next) => {
 exports.getInvoice = (req, res, next) => {
   const { orderId } = req.params;
   Order.findById(orderId)
+    .select("profile")
+    .lean()
     .then((order) => {
       if (!order) {
         return next(new Error("No order found"));
@@ -233,65 +227,6 @@ exports.getCheckout = async (req, res, next) => {
     path: "/checkout",
     pageTitle: "Checkout",
   });
-};
-
-exports.getCheckoutSuccess = (req, res, next) => {
-  // req.profile
-  //   .populate("cart.items.productId")
-  //   .execPopulate()
-  //   .then((profile) => {
-  //     const products = profile.cart.items.map((i) => {
-  //       return {
-  //         quantity: i.quantity,
-  //         product: { ...i.productId._doc },
-  //       };
-  //     });
-  //     const order = new Order({
-  //       profile: {
-  //         profileId: req.profile._id,
-  //       },
-  //       products,
-  //     });
-  //     return order.save();
-  //   })
-  //   .then((order) => {
-  //     return order;
-  //   })
-  //   .then((order) => {
-  //     const doc = new PDFDocument();
-  //     doc.pipe(fs.createWriteStream(`data/invoices/invoice-${order._id}.pdf`));
-  //     doc.text(`Thank you! ${req.profile.email}`);
-  //     doc.text(`Date of order: ${order.createdAt}`);
-  //     doc.text("Products: ");
-  //     let totalPrice = 0;
-  //     order.products.forEach((product) => {
-  //       const price = product.product.price * product.quantity;
-  //       totalPrice += price;
-  //       doc.text(
-  //         `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
-  //       );
-  //       doc.image(product.product.imageUrl, {
-  //         fit: [200, 200],
-  //         align: "left",
-  //       });
-  //     });
-  //     doc.text(`Total price: ${totalPrice}`);
-  //     doc.end();
-  //     req.profile.clearCart();
-  //     res.redirect("/orders");
-  //     const msg = {
-  //       to: req.profile.email,
-  //       from: "test@example.com",
-  //       subject: "Thank you for order",
-  //       html: `<strong><a href="${process.env.BASE_URL}/orders/${order._id}">Invoice</a></strong>`,
-  //     };
-  //     sgMail.send(msg);
-  //   })
-  //   .catch((err) => {
-  //     const error = new Error(err);
-  //     error.status = 500;
-  //     return next(error);
-  //   });
 };
 
 exports.postCheckout = async (req, res, next) => {
@@ -422,40 +357,18 @@ exports.postCheckout = async (req, res, next) => {
     message: "Order created",
     session,
   });
-  // await profile.populate("cart.items.productId").execPopulate();
+};
 
-  // let totalPrice = 0;
+exports.getCheckoutSuccess = async (req, res, next) => {
+  res.render("shop/checkout-success", {
+    pageTitle: "Checkout success",
+    path: "/",
+  });
+};
 
-  // const products = profile.cart.items.map((i) => {
-  //   return {
-  //     quantity: i.quantity,
-  //     product: { ...i.productId._doc },
-  //   };
-  // });
-
-  // const lineItems = [];
-
-  // products.forEach((p) => {
-  //   totalPrice += p.quantity * p.product.price;
-  //   lineItems.push({
-  //     price_data: {
-  //       currency: "eur",
-  //       product_data: {
-  //         name: p.product.title,
-  //         description: p.product.description,
-  //       },
-  //       unit_amount: p.product.price,
-  //     },
-  //     quantity: p.quantity,
-  //   });
-  // });
-
-  // const session = await stripe.checkout.sessions.create({
-  //   customer_email: profile.email,
-  //   payment_method_types: ["card"],
-  //   line_items: lineItems,
-  //   mode: "payment",
-  //   success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
-  //   cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
-  // });
+exports.getCheckoutCancel = async (req, res, next) => {
+  res.render("shop/checkout-cancel", {
+    pageTitle: "Checkout cancel",
+    path: "/",
+  });
 };

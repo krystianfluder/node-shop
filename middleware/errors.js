@@ -3,7 +3,7 @@ exports.catchAsync = (fn) => {
     const routePromise = fn(req, res, next);
     if (routePromise.catch) {
       // next(err)
-      routePromise.catch((err) => console.log(err));
+      routePromise.catch((err) => next(err));
     }
   };
 };
