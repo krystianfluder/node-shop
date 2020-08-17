@@ -5,8 +5,7 @@ const multer = require("multer");
 const { body } = require("express-validator");
 
 const adminController = require("../controllers/admin");
-const isAuth = require("../middleware/is-auth");
-const isAdmin = require("../middleware/is-admin");
+const { isAdmin, isAuth } = require("../middleware/auth");
 const router = express.Router();
 
 const storage = multer.diskStorage({

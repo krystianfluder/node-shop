@@ -1,10 +1,8 @@
 const { validationResult } = require("express-validator");
-const sgMail = require("@sendgrid/mail");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const { transporter } = require("../config/mails");
 const Profile = require("../models/profile");
-
-sgMail.setApiKey(process.env.SENDGRID_KEY);
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
@@ -122,14 +120,18 @@ exports.postRegister = (req, res, next) => {
       return profile.save();
     })
     .then(() => {
-      const msg = {
-        to: email,
-        from: "test@example.com",
-        subject: "Sending with Twilio SendGrid is Fun",
-        text: "and easy to do anywhere, even with Node.js",
-        html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-      };
-      sgMail.send(msg);
+      transporter
+        .sendMail({
+          from: "test@test.com",
+          to: email,
+          subject: "register",
+          html: `<b>${email}</b>`, // html
+        })
+        .catch((err) => {
+          const error = new Error(err);
+          error.status = 500;
+          return next(error);
+        });
       return res.redirect("/login");
     })
     .catch((err) => {
@@ -180,18 +182,23 @@ exports.postReset = (req, res, next) => {
       })
       .then((profile) => {
         if (profile) {
-          res.redirect("/new-password");
-          const msg = {
-            to: profile.email,
-            from: "test@example.com",
-            subject: "Reset password",
-            html: `
+          transporter
+            .sendMail({
+              from: "test@test.com",
+              to: profile.email,
+              subject: "Reset password",
+              html: `
             <p>You requested a password reset</p>
             <p>Code: ${token}</p>
             <p>Click this <a href="${process.env.BASE_URL}/new-password/${token}">link</a> to set a new password</p>
           `,
-          };
-          sgMail.send(msg);
+            })
+            .catch((err) => {
+              const error = new Error(err);
+              error.status = 500;
+              return next(error);
+            });
+          res.redirect("/new-password");
         }
       })
       .catch((err) => {
