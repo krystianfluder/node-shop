@@ -11,24 +11,29 @@
       <h1>Nothing there!</h1>      
       
     <% } else { %>
-
-    <ul class="list-group">
+    
+    <h2 class="mb-4">Total orders: <%= totalOrders %></h2>
+    <ul class="list-group mb-4">
       <% orders.forEach(order => { %>
       <li class="list-group-item">
-      <h2>Id: <%= order._id %></h1>
-      <p>Total price: <%= order.totalPrice/100 %> €</p>
-      Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
-      <ul class="list-group">
-        <% order.products.forEach(p => { %>
-        <li class="list-group-item d-flex align-items-center">
-          <a class="btn btn-link" href="/products/<%= p.product._id %>"><%= p.product.title %></a>
-          <div><%= p.product.price/100 %> € * <%= p.quantity %> = <%= (p.product.price/100) * p.quantity %> </div>
-        </li>
-        <% }); %>
-      </ul>
+        <h2 class="mb-4">Id: <%= order._id %></h1>
+        <p>Total price: <%= order.totalPrice/100 %> €</p>
+        <p>Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
+        </p>
+        <h3>Products: </h3>
+        <ul class="list-group">
+          <% order.products.forEach(p => { %>
+          <li class="list-group-item d-flex align-items-center">
+            <a class="btn btn-link" href="/products/<%= p.product._id %>"><%= p.product.title %></a>
+            <div><%= p.product.price/100 %> € * <%= p.quantity %> = <%= (p.product.price/100) * p.quantity %> </div>
+          </li>
+          <% }); %>
+        </ul>
       </li>
       <% }); %>
     </ul>
+
+    <%- include('../includes/pagination.ejs') %>
 
     <% } %>
   </main>

@@ -131,14 +131,43 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
+  let page = req.query.page;
+  if (!page) {
+    page = 1;
+  }
+  let totalOrders;
+
   Order.find({ "profile.profileId": req.profile._id })
+    .countDocuments()
+    .then((numOrders) => {
+      totalOrders = numOrders;
+      return Order.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((orders) => {
+      console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
         orders,
+        totalOrders,
+        currentPage: page,
+        hasPrev: page > 1,
+        hasNext: page * ITEMS_PER_PAGE < totalOrders,
+        firstPage: 1,
+        lastPage: Math.ceil(totalOrders / ITEMS_PER_PAGE),
       });
     })
+
+    // Order.find({ "profile.profileId": req.profile._id })
+    //   .then((orders) => {
+    //     res.render("shop/orders", {
+    //       path: "/orders",
+    //       pageTitle: "Orders",
+    //       orders,
+    //     });
+    //   })
     .catch((err) => {
       const error = new Error(err);
       error.status = 500;
