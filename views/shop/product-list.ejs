@@ -17,8 +17,8 @@
             <h2>
               <%= product.title %>
             </h2>
-            <p>$
-              <%= product.price/100 %>
+            <p>
+              <%= product.price/100 %> <%= process.env.CURRENCY %>
             </p>
             <div class="card-group d-flex justify-content-between">
             <a href="/products/<%= product._id %>" class="btn btn-primary">Details</a>

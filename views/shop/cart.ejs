@@ -8,8 +8,8 @@
       <%- include('../includes/breadcrumbs-and-header.ejs') %>
       <% if (products.length > 0) { %>
 
-      <h2 class="mb-4">Total price: <%= totalPrice/100 %></h2>
-
+      <h2 class="mb-4">Total price: <%= totalPrice/100 %> <%= process.env.CURRENCY %></h2>
+      
       <div class="d-flex mb-4">        
         <% products.forEach(p => { %>
           <div class="card" style="width: 200px;">
@@ -18,8 +18,8 @@
               <h2>
                 <%= p.productId.title %>
               </h2>
-              <p>$
-                <%= p.productId.price/100 %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %>
+              <p>
+                <%= p.productId.price/100 %> <%= process.env.CURRENCY %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %> <%= process.env.CURRENCY %>
               </p>
               <div class="card-group d-flex justify-content-between">
                 <form action="/cart-delete-item" method="POST">

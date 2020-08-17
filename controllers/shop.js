@@ -164,7 +164,8 @@ exports.getOrders = (req, res, next) => {
       totalOrders = numOrders;
       return Order.find()
         .skip((page - 1) * ITEMS_PER_PAGE)
-        .limit(ITEMS_PER_PAGE);
+        .limit(ITEMS_PER_PAGE)
+        .lean();
     })
     .then((orders) => {
       console.log(orders);

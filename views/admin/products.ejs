@@ -18,7 +18,7 @@
             <%= product.title %>
           </h2>
           <p>
-            $ <%= product.price/100 %>
+              <%= product.price/100 %> <%= process.env.CURRENCY %> 
           </p>
           <p>
             <%= product.description %>
