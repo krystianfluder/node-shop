@@ -6,6 +6,7 @@ const { body } = require("express-validator");
 
 const adminController = require("../controllers/admin");
 const { isAdmin, isAuth } = require("../middleware/auth");
+const { catchAsync } = require("../middleware/errors");
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -90,5 +91,7 @@ router.post(
 );
 
 router.post("/delete-product", adminController.postDeleteProduct);
+
+router.get("/orders", catchAsync(adminController.getOrders));
 
 module.exports = router;

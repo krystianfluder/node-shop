@@ -1,5 +1,42 @@
-<form action="/cart" method="post">
-  <button class="btn btn-primary" type="submit">Add to Cart</button>
+<form class="add-to-cart" action="/cart" method="post">
+  <i class="fas fa-minus add-to-cart-minus"></i>
+  <span class="add-to-cart-display">1</span>
+  <i class="fas fa-plus add-to-cart-plus"></i>
+
+  <button class="btn btn-primary .add-to-cart-button" type="submit">
+    Add to Cart
+  </button>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-  <input type="hidden" name="productId" value="<%= product._id %>" />
+  <input
+    class="add-to-cart-iproductId"
+    type="hidden"
+    name="productId"
+    value="<%= product._id %>"
+  />
+  <input
+    class="add-to-cart-iquantity"
+    type="hidden"
+    name="quantity"
+    value="1"
+  />
 </form>
+
+<!-- 
+<script>
+  let counter = 0;
+
+  const minusButton = document.("add-to-cart-minus");
+  const plusButton = document.getElementById("add-to-cart-plus");
+  const display = document.getElementById("add-to-cart-display");
+  display.textContent = counter;
+
+  minusButton.addEventListener("click", () => {
+    counter -= 1;
+    display.textContent = counter;
+  });
+
+  plusButton.addEventListener("click", () => {
+    counter += 1;
+    display.textContent = counter;
+  });
+</script> -->

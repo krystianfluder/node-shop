@@ -1,8 +1,11 @@
 const { v4 } = require("uuid");
 const sharp = require("sharp");
 const Product = require("../models/product");
+const Order = require("../models/order");
 const { validationResult } = require("express-validator");
 const fileHelper = require("../util/file");
+
+const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
 
 exports.getAddProduct = (req, res, next) => {
   let message = req.flash("error");
@@ -185,4 +188,31 @@ exports.postDeleteProduct = (req, res, next) => {
       error.status = 500;
       return next(error);
     });
+};
+
+exports.getOrders = async (req, res, next) => {
+  let page = req.query.page;
+  if (!page) {
+    page = 1;
+  }
+
+  const totalOrders = await Order.countDocuments();
+
+  const orders = await Order.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .select("totalPrice createdAt products")
+    .populate("profile");
+
+  res.render("admin/orders", {
+    pageTitle: "Admin Products",
+    path: "/admin/orders",
+    orders,
+    totalOrders,
+    currentPage: page,
+    hasPrev: page > 1,
+    hasNext: page * ITEMS_PER_PAGE < totalOrders,
+    firstPage: 1,
+    lastPage: Math.ceil(totalOrders / ITEMS_PER_PAGE),
+  });
 };

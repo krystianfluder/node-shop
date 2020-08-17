@@ -6,32 +6,51 @@
   <main class="container">
     <%- include('../includes/breadcrumbs-and-header.ejs') %>
 
-    <div id="content">Loading...</div>
+    <div id="content"></div>
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
         var stripe = Stripe('<%= process.env.STRIPE_PUBLISHABLE_KEY %>');
 
-        const contentDiv = document.getElementById('content');
+        const wrapper = document.getElementById('content');
+
+        // spinner
+        const spinner = document.createElement('div');
+        spinner.id = "checkout-spinner";
+        spinner.classList.add('spinner-border');
+        spinner.setAttribute('role', 'status');
+        const span = document.createElement('span');
+        span.classList.add('sr-only');
+        span.textContent = "Loading...";
+        spinner.appendChild(span);
+        wrapper.appendChild(spinner)
+
+
         let loading = true;
 
         fetch(`<%= process.env.BASE_URL %>/cart-items`).then(res => res.json()).then(res => {
           const { totalPrice, products } = res;
+
           const fragment = document.createDocumentFragment();
           const fragmentHeader = document.createElement('h2');
           const fragmentBody = document.createElement('div');
 
           // order button
           const fragmentButton = document.createElement('button');
+          fragmentButton.classList.add('btn');
+          fragmentButton.classList.add('btn-primary');
+          fragmentButton.classList.add('mt-4');
           fragmentButton.textContent = "Order"
           fragmentButton.id = 'order-btn'
 
           // total price h2
           fragmentHeader.textContent = `Total price: ${totalPrice/100}`
-          fragment.appendChild(fragmentHeader)
+          fragmentHeader.classList.add('mb-4');
 
           // create cards
-          products.forEach(product => {
+          products.forEach(({productId, quantity}) => {
+            const { title, price, imageUrlSmall } = productId;
+
             const productDiv = document.createElement('div');
             productDiv.classList.add('card');
             const cardHeader = document.createElement('div');
@@ -39,14 +58,17 @@
             const cardBody = document.createElement('div');
             cardBody.classList.add('card-body');
 
-            cardHeader.textContent = `Product: ${product.productId.title}`;
-            cardBody.textContent = JSON.stringify(product)  
-            
+            cardHeader.textContent = `Product: ${title}`;
+            cardBody.textContent = `
+              ${price/200} <%= process.env.CURRENCY %> * ${quantity} = ${price/100 * quantity}
+            `
+
             productDiv.appendChild(cardHeader);
             productDiv.appendChild(cardBody)
             fragmentBody.appendChild(productDiv);
           })
 
+          // prepare products to send
           const parseProducts = products.map(product => {
             return {
               "_id": product.productId._id,
@@ -66,16 +88,19 @@
             })
             .then(res => res.json())
             .then(res => {
+              wrapper.appendChild(spinner);
               if (res.message === "Order created") {
                 return stripe.redirectToCheckout({sessionId: res.session.id})
               }
             })
           })
 
+          fragment.appendChild(fragmentHeader)
           fragment.appendChild(fragmentBody)
           fragment.appendChild(fragmentButton)        
 
-          contentDiv.appendChild(fragment)
+          spinner.remove();
+          wrapper.appendChild(fragment)
           loading = false;
         })   
     </script>

@@ -14,7 +14,7 @@ router.get("/products/:productId", shopController.getProduct);
 
 router.get("/cart", isAuth, shopController.getCart);
 
-router.post("/cart", isAuth, shopController.postCart);
+router.post("/cart", isAuth, catchAsync(shopController.postCart));
 
 router.get("/cart-items", isAuth, shopController.getCartItems);
 

@@ -13,18 +13,14 @@
         <h2><%= product.price/100 %> <%= process.env.CURRENCY %></h2>
         <% if (isAuthenticated) { %>
           <%- include('../includes/add-to-cart.ejs') %>
-          <% } %>
+        <% } %>
       </div>
     </div>
 
     <hr>
 
-    <div class="row mt-4">
-      <p>
-        <%= product.description %>
-      </p>
-    </div>
-
-
+    <%= product.description %>
+     
   </main>
   <%- include('../includes/end.ejs') %>
+  <%- include('../includes/add-to-cart-script.ejs') %>

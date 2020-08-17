@@ -1,0 +1,28 @@
+<script>
+  const controls = document.querySelectorAll(".add-to-cart");
+
+  controls.forEach((control) => {
+    let counter = 1;
+
+    const minus = control.querySelector(".add-to-cart-minus");
+    const plus = control.querySelector(".add-to-cart-plus");
+    const display = control.querySelector(".add-to-cart-display");
+    const button = control.querySelector(".add-to-cart-button");
+    const input = control.querySelector(".add-to-cart-iquantity");
+
+    const save = () => {
+      display.textContent = counter;
+      input.value = counter;
+    };
+
+    minus.addEventListener("click", () => {
+      counter -= 1;
+      save();
+    });
+
+    plus.addEventListener("click", () => {
+      counter += 1;
+      save();
+    });
+  });
+</script>

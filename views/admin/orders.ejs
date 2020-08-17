@@ -21,7 +21,6 @@
         <p>Total price: <%= order.totalPrice/100 %> <%= process.env.CURRENCY %></p>
         <p>Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
         </p>
-        <p>Paid: <%= order.paid %></p>
         <h3>Products: </h3>
         <ul class="list-group">
           <% order.products.forEach(p => { %>
@@ -31,6 +30,10 @@
           </li>
           <% }); %>
         </ul>
+        <h3>Profile</h3>
+        <P>
+          <%= order.profile %>
+        </P>
       </li>
       <% }); %>
     </ul>

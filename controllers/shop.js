@@ -123,19 +123,30 @@ exports.getCartItems = (req, res, next) => {
     });
 };
 
-exports.postCart = (req, res, next) => {
-  const prodId = req.body.productId;
+exports.postCart = async (req, res, next) => {
+  const { productId, quantity } = req.body;
 
-  Product.findById(prodId)
-    .then((product) => {
-      req.profile.addToCart(product);
-      res.redirect("/cart");
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
-    });
+  if (!productId) {
+    const error = new Error("ProductId does not exist");
+    error.status = 400;
+    return next();
+  }
+
+  const product = await Product.findById(productId);
+
+  await req.profile.addToCart(product, quantity);
+
+  res.redirect("/cart");
+
+  // .then((product) => {
+  //   req.profile.addToCart(product);
+  //   res.redirect("/cart");
+  // })
+  // .catch((err) => {
+  //   const error = new Error(err);
+  //   error.status = 500;
+  //   return next(error);
+  // });
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
