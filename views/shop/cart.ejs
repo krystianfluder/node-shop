@@ -28,6 +28,7 @@
                   <button class="btn btn-danger" type="submit">Delete</button>
                 </form>
               </div>
+              <%- include('../includes/add-to-cart.ejs', {product: p.productId}) %>
             </div>
           </div>
         <% }) %>
@@ -41,3 +42,4 @@
 
     </main>
     <%- include('../includes/end.ejs') %>
+    <%- include('../includes/add-to-cart-script.ejs') %>

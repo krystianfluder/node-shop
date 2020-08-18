@@ -8,6 +8,12 @@ const orderSchema = new Schema(
       required: true,
       default: false,
     },
+    status: {
+      type: String,
+      required: true,
+      enum: ["not paid", "in progress", "provided"],
+      default: "not paid",
+    },
     products: [
       {
         product: {

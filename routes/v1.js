@@ -1,34 +1,36 @@
 const stripe = require("stripe");
 const express = require("express");
 const router = express.Router();
+const { catchAsync } = require("../middleware/errors");
+const Order = require("../models/order");
 
-router.post("/webhook", (req, res, next) => {
-  res.json({
-    message: "webhook",
-  });
-  // const sig = req.headers["stripe-signature"];
-  // let event;
-  // try {
-  //   event = stripe.webhooks.constructEvent(
-  //     req.body.rawBody,
-  //     sig,
-  //     process.env.STRIPE_WHSEC
-  //   );
-  // } catch (err) {
-  //   return res.send({ message: "Stripe - webhook error" });
-  // }
-  // console.log(event);
-  // // handle type of webhook
-  // switch (event.type) {
-  //   case "payment_intent.succeeded":
-  //     // payment success
-  //     console.log("success :D");
-  //     break;
-  //   case "payment_intent.payment_failed":
-  //     // payment failed
-  //     console.log("failed :D");
-  //     break;
-  // }
-});
+const endpointSecret = process.env.STRIPE_WHSEC;
+
+router.post(
+  "/webhook",
+  catchAsync(async (req, res, next) => {
+    const sig = req.headers["stripe-signature"];
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err) {
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      const order = Order.findOne({
+        "session.id": session.id,
+      });
+      if (!order) {
+        return res.status(400).send(`Not found order`);
+      }
+      order.paid = true;
+      order.status = "in progress";
+      await order.save();
+
+      return es.json({ received: true });
+    }
+  })
+);
 
 module.exports = router;

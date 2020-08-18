@@ -19,8 +19,20 @@
         <h2 class="mb-4">Id: <%= order._id %></h1>
         <p>Created at: <%= order.createdAt %></p>
         <p>Total price: <%= order.totalPrice/100 %> <%= process.env.CURRENCY %></p>
-        <p>Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
-        </p>
+        <p>Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a></p>
+
+        <% order.paid ? order.paid = 'true' : order.paid = 'false' %>
+        <p>Paid: <%= order.paid %></p>
+
+        <p>Status: <%= order.status %></p>
+
+        <% if(order.status === "in progress") { %>
+        <form action="/admin/order-delivered/<%= order._id %>" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-primary" type="submit">Click if order delivered</button>
+        </form>
+        <% } %>
+
         <h3>Products: </h3>
         <ul class="list-group">
           <% order.products.forEach(p => { %>

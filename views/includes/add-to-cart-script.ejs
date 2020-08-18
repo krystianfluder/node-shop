@@ -16,7 +16,9 @@
     };
 
     minus.addEventListener("click", () => {
-      counter -= 1;
+      if (counter >= 2) {
+        counter -= 1;
+      }
       save();
     });
 

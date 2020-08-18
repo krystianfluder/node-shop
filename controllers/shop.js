@@ -154,9 +154,12 @@ exports.getOrders = (req, res, next) => {
     .then((numOrders) => {
       totalOrders = numOrders;
       return Order.find()
+        .sort({
+          createdAt: "desc",
+        })
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE)
-        .select("createdAt totalPrice products")
+        .select("createdAt totalPrice products status paid")
         .lean();
     })
     .then((orders) => {
@@ -283,7 +286,6 @@ exports.postCheckout = async (req, res, next) => {
       profileId: req.profile._id,
     },
     products: orderProducts,
-    paid: false,
     session,
     totalPrice,
   });

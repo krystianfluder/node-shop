@@ -94,4 +94,9 @@ router.post("/delete-product", adminController.postDeleteProduct);
 
 router.get("/orders", catchAsync(adminController.getOrders));
 
+router.post(
+  "/order-delivered/:orderId",
+  catchAsync(adminController.postOrderDelivered)
+);
+
 module.exports = router;

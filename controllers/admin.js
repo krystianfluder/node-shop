@@ -1,6 +1,7 @@
 const { v4 } = require("uuid");
 const sharp = require("sharp");
 const Product = require("../models/product");
+const Profile = require("../models/profile");
 const Order = require("../models/order");
 const { validationResult } = require("express-validator");
 const fileHelper = require("../util/file");
@@ -182,14 +183,15 @@ exports.getOrders = async (req, res, next) => {
   if (!page) {
     page = 1;
   }
-
   const totalOrders = await Order.countDocuments();
-
   const orders = await Order.find()
+    .select("profile products totalPrice createdAt status paid")
+    .sort({
+      createdAt: "desc",
+    })
+    .populate("profile.profileId", "email createdAt")
     .skip((page - 1) * ITEMS_PER_PAGE)
-    .limit(ITEMS_PER_PAGE)
-    .select("totalPrice createdAt products")
-    .populate("profile");
+    .limit(ITEMS_PER_PAGE);
 
   res.render("admin/orders", {
     pageTitle: "Admin Products",
@@ -201,4 +203,14 @@ exports.getOrders = async (req, res, next) => {
     firstPage: 1,
     lastPage: Math.ceil(totalOrders / ITEMS_PER_PAGE),
   });
+};
+
+exports.postOrderDelivered = async (req, res, next) => {
+  const { orderId } = req.params;
+
+  const order = await Order.findById(orderId).select("_id");
+  order.status = "provided";
+  await order.save();
+
+  res.redirect("/admin/orders");
 };
