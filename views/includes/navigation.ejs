@@ -34,13 +34,33 @@
           >Cart</a
         >
       </li>
-      <li class="nav-item">
+
+      <li class="nav-item dropdown">
         <a
-          class="nav-link <%= path === '/orders' ? 'active' : '' %>"
-          href="/orders"
-          >Orders</a
+          class="nav-link dropdown-toggle"
+          href="#"
+          id="navbarDropdown"
+          role="button"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
         >
+          Orders
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a
+            class="dropdown-item <%= path === '/unpaid-orders' ? 'active' : '' %>"
+            href="/unpaid-orders"
+            >Unpaid orders</a
+          >
+          <a
+            class="dropdown-item <%= path === '/orders' ? 'active' : '' %>"
+            href="/orders"
+            >Paid orders</a
+          >
+        </div>
       </li>
+
       <% if (isAdmin) { %>
       <li class="nav-item dropdown">
         <a

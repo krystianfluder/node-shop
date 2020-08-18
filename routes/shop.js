@@ -20,7 +20,13 @@ router.get("/cart-items", isAuth, shopController.getCartItems);
 
 router.post("/cart-delete-item", isAuth, shopController.postCartDeleteProduct);
 
-router.get("/orders", isAuth, shopController.getOrders);
+router.get("/orders", isAuth, catchAsync(shopController.getOrders));
+
+router.get(
+  "/unpaid-orders",
+  isAuth,
+  catchAsync(shopController.getUnpaidOrders)
+);
 
 router.get("/orders/:orderId", isAuth, shopController.getInvoice);
 

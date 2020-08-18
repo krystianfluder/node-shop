@@ -18,14 +18,14 @@
       <div class="card mb-4">
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
-            <h2>Id: <%= order._id %></h1>
+            <h2 class="mb-4">Id: <%= order._id %></h2>
+            <button class="btn btn-primary orders-pay" data-session-id="<%= order.session.id %>">
+              Pay by card
+            </button>  
           </li>
           <li class="list-group-item">Created at: <%= order.createdAt %></li>
           <li class="list-group-item">Total price: <%= order.totalPrice/100 %> <%= process.env.CURRENCY %></li>
           <li class="list-group-item">Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a></li>
-          <% order.paid ? order.paid = 'true' : order.paid = 'false' %>
-          <li class="list-group-item">Paid: <%= order.paid %></li>
-          <li class="list-group-item">Status: <%= order.status %></li>
           <li class="list-group-item">
             <h3 class="mb-4">Products: </h3>
             <ul class="list-group">
@@ -50,3 +50,17 @@
     <% } %>
   </main>
   <%- include('../includes/end.ejs') %>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    var stripe = Stripe('<%= process.env.STRIPE_PUBLISHABLE_KEY %>');
+
+    const ordersPayButtons = [...document.querySelectorAll('.orders-pay')];
+
+    ordersPayButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const sessionId = button.dataset.sessionId;
+        stripe.redirectToCheckout({sessionId: sessionId})
+      })
+    })
+  </script>

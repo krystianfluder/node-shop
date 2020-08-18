@@ -142,41 +142,74 @@ exports.postCartDeleteProduct = (req, res, next) => {
     });
 };
 
-exports.getOrders = (req, res, next) => {
+exports.getOrders = async (req, res, next) => {
   let page = req.query.page;
   if (!page) {
     page = 1;
   }
-  let totalOrders;
 
-  Order.find({ "profile.profileId": req.profile._id })
-    .countDocuments()
-    .then((numOrders) => {
-      totalOrders = numOrders;
-      return Order.find()
-        .sort({
-          createdAt: "desc",
-        })
-        .skip((page - 1) * ITEMS_PER_PAGE)
-        .limit(ITEMS_PER_PAGE)
-        .select("createdAt totalPrice products status paid")
-        .lean();
+  const totalOrders = await Order.find({
+    "profile.profileId": req.profile._id,
+    paid: true,
+  }).countDocuments();
+
+  const orders = await Order.find({
+    "profile.profileId": req.profile._id,
+    paid: true,
+  })
+    .sort({
+      createdAt: "desc",
     })
-    .then((orders) => {
-      res.render("shop/orders", {
-        pageTitle: "Orders",
-        orders,
-        totalOrders,
-        currentPage: page,
-        hasPrev: page > 1,
-        hasNext: page * ITEMS_PER_PAGE < totalOrders,
-        firstPage: 1,
-        lastPage: Math.ceil(totalOrders / ITEMS_PER_PAGE),
-      });
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .select("createdAt totalPrice products status paid")
+    .lean();
+
+  res.render("shop/paid-orders", {
+    pageTitle: "Paid orders",
+    orders,
+    totalOrders,
+    currentPage: page,
+    hasPrev: page > 1,
+    hasNext: page * ITEMS_PER_PAGE < totalOrders,
+    firstPage: 1,
+    lastPage: Math.ceil(totalOrders / ITEMS_PER_PAGE),
+  });
+};
+
+exports.getUnpaidOrders = async (req, res, next) => {
+  let page = req.query.page;
+  if (!page) {
+    page = 1;
+  }
+
+  const totalOrders = await Order.find({
+    "profile.profileId": req.profile._id,
+    paid: false,
+  }).countDocuments();
+
+  const orders = await Order.find({
+    "profile.profileId": req.profile._id,
+    paid: false,
+  })
+    .sort({
+      createdAt: "desc",
     })
-    .catch((err) => {
-      return next(handleError500(err));
-    });
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .select("createdAt totalPrice products status paid session.id")
+    .lean();
+
+  res.render("shop/unpaid-orders", {
+    pageTitle: "Unpaid orders",
+    orders,
+    totalOrders,
+    currentPage: page,
+    hasPrev: page > 1,
+    hasNext: page * ITEMS_PER_PAGE < totalOrders,
+    firstPage: 1,
+    lastPage: Math.ceil(totalOrders / ITEMS_PER_PAGE),
+  });
 };
 
 exports.getInvoice = (req, res, next) => {
@@ -299,19 +332,21 @@ exports.postCheckout = async (req, res, next) => {
   doc.pipe(writeStream);
   doc.text(`Thank you! ${req.profile.email}`);
   doc.text(`Date of order: ${order.createdAt}`);
+  doc.text(`Total price: ${totalPrice / 100} ${process.env.CURRENCY}`);
   doc.text("Products: ");
 
   orderProducts.forEach((product) => {
     const price = product.product.price * product.quantity;
     doc.text(
-      `${product.product.title} x ${product.quantity} || ${product.product.price} x ${product.quantity} = ${price}`
+      `${product.product.title} x ${product.quantity} || ${
+        product.product.price / 100
+      } x ${product.quantity} = ${price / 100} ${process.env.CURRENCY}`
     );
     doc.image(product.product.imageUrl, {
       fit: [200, 200],
       align: "left",
     });
   });
-  doc.text(`Total price: ${totalPrice}`);
   doc.end();
 
   writeStream.on("finish", async () => {
