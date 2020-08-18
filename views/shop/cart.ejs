@@ -1,5 +1,4 @@
 <%- include('../includes/head.ejs') %>
-<link rel="stylesheet" href="/css/cart.css">
 </head>
 
 <body>
@@ -10,26 +9,28 @@
 
       <h2 class="mb-4">Total price: <%= totalPrice/100 %> <%= process.env.CURRENCY %></h2>
       
-      <div class="d-flex mb-4">        
+      <div class="d-flex flex-wrap mb-4">
         <% products.forEach(p => { %>
           <div class="card" style="width: 200px;">
             <img class="card-image-top" src="/<%= p.productId.imageUrlSmall %>" alt="<%= p.productId.title %>">
-            <div class="card-body">
-              <h2>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
                 <%= p.productId.title %>
-              </h2>
-              <p>
+              </li>
+              <li class="list-group-item">
                 <%= p.productId.price/100 %> <%= process.env.CURRENCY %> * <%= p.quantity %> = <%= p.productId.price/100 * p.quantity %> <%= process.env.CURRENCY %>
-              </p>
-              <div class="card-group d-flex justify-content-between">
-                <form action="/cart-delete-item" method="POST">
-                  <input type="hidden" value="<%= p.productId._id %>" name="productId">
-                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                  <button class="btn btn-danger" type="submit">Delete</button>
-                </form>
-              </div>
-              <%- include('../includes/add-to-cart.ejs', {product: p.productId}) %>
-            </div>
+                <div class="card-group d-flex justify-content-between">
+                  <form action="/cart-delete-item" method="POST">
+                    <input type="hidden" value="<%= p.productId._id %>" name="productId">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                  </form>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <%- include('../includes/add-to-cart.ejs', {product: p.productId, quantity: p.quantity}) %>
+              </li>
+            </ul>
           </div>
         <% }) %>
       </div>

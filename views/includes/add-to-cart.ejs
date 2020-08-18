@@ -1,7 +1,9 @@
-<form class="add-to-cart" action="/cart" method="post">
-  <i class="fas fa-minus add-to-cart-minus"></i>
-  <span class="add-to-cart-display">1</span>
-  <i class="fas fa-plus add-to-cart-plus"></i>
+<form class="add-to-cart d-flex flex-column" action="/cart" method="post">
+  <div class="p-2 d-flex align-items-center justify-content-between">
+    <i class="fas fa-minus add-to-cart-minus"></i>
+    <span class="add-to-cart-display"></span>
+    <i class="fas fa-plus add-to-cart-plus"></i>
+  </div>
 
   <button class="btn btn-primary .add-to-cart-button" type="submit">
     Add to Cart
@@ -17,7 +19,7 @@
     class="add-to-cart-iquantity"
     type="hidden"
     name="quantity"
-    value="1"
+    value="<%= quantity %>"
   />
 </form>
 
