@@ -13,32 +13,37 @@
     <% } else { %>
     
     <h2 class="mb-4">Total orders: <%= totalOrders %></h2>
-    <ul class="list-group mb-4">
-      <% orders.forEach(order => { %>
-      <li class="list-group-item">
-        <h2 class="mb-4">Id: <%= order._id %></h1>
-        <p>Created at: <%= order.createdAt %></p>
-        <p>Total price: <%= order.totalPrice/100 %> <%= process.env.CURRENCY %></p>
-        <p>Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a>
-        </p>
 
-        <% order.paid ? order.paid = 'true' : order.paid = 'false' %>
-        <p>Paid: <%= order.paid %></p>
-
-        <p>Status: <%= order.status %></p>
-
-        <h3>Products: </h3>
-        <ul class="list-group">
-          <% order.products.forEach(p => { %>
-          <li class="list-group-item d-flex align-items-center">
-            <a class="btn btn-link" href="/products/<%= p.product._id %>"><%= p.product.title %></a>
-            <div><%= p.product.price/100 %> € * <%= p.quantity %> = <%= (p.product.price/100) * p.quantity %> <%= process.env.CURRENCY %></div>
+    <% orders.forEach(order => { %>
+      <div class="card mb-4">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <h2>Id: <%= order._id %></h1>
           </li>
-          <% }); %>
+          <li class="list-group-item">Created at: <%= order.createdAt %></li>
+          <li class="list-group-item">Total price: <%= order.totalPrice/100 %> <%= process.env.CURRENCY %></li>
+          <li class="list-group-item">Invoice: <a class="btn btn-link" href="/orders/<%= order._id %>">Download</a></li>
+          <% order.paid ? order.paid = 'true' : order.paid = 'false' %>
+          <li class="list-group-item">Paid: <%= order.paid %></li>
+          <li class="list-group-item">Status: <%= order.status %></li>
+          <li class="list-group-item">
+            <h3 class="mb-4">Products: </h3>
+            <ul class="list-group">
+              <% order.products.forEach(p => { %>
+              <li class="list-group-item d-flex flex-wrap align-items-center">
+                <div>
+                  <%= p.product.title %><a class="btn btn-link" href="/products/<%= p.product._id %>">Read more</a>
+                </div>
+                <div>
+                  <%= p.product.price/100 %> € * <%= p.quantity %> = <%= (p.product.price/100) * p.quantity %> <%= process.env.CURRENCY %>
+                </div>                
+              </li>
+              <% }); %>
+            </ul>
+          </li>
         </ul>
-      </li>
+      </div>
       <% }); %>
-    </ul>
 
     <%- include('../includes/pagination.ejs') %>
 
