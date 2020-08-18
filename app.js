@@ -73,6 +73,7 @@ app.use(flash());
 // const certificate = fs.readFileSync("server.cert");
 
 app.use((req, res, next) => {
+  res.locals.path = req.url;
   res.locals.breadcrumbs = getBreadcrumbs(req.url);
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.isAdmin = req.session.isAdmin;

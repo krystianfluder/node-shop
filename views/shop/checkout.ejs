@@ -44,7 +44,7 @@
           fragmentButton.id = 'order-btn'
 
           // total price h2
-          fragmentHeader.textContent = `Total price: ${totalPrice/100}`
+          fragmentHeader.textContent = `Total price: ${totalPrice/100} <%= process.env.CURRENCY %>`
           fragmentHeader.classList.add('mb-4');
 
           // create cards
@@ -60,7 +60,7 @@
 
             cardHeader.textContent = `Product: ${title}`;
             cardBody.textContent = `
-              ${price/200} <%= process.env.CURRENCY %> * ${quantity} = ${price/100 * quantity}
+              ${price/200} <%= process.env.CURRENCY %> * ${quantity} = ${price/100 * quantity} <%= process.env.CURRENCY %>
             `
 
             productDiv.appendChild(cardHeader);

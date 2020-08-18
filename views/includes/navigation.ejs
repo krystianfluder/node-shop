@@ -42,26 +42,46 @@
         >
       </li>
       <% if (isAdmin) { %>
-      <li class="nav-item">
+      <li class="nav-item dropdown">
         <a
-          class="nav-link <%= path === '/admin/add-product' ? 'active' : '' %>"
-          href="/admin/add-product"
-          >Add Product
+          class="nav-link dropdown-toggle"
+          href="#"
+          id="navbarDropdown"
+          role="button"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          Admin
         </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a
+            class="dropdown-item <%= path === '/admin/add-product' ? 'active' : '' %>"
+            href="/admin/add-product"
+            >Add Product
+          </a>
+          <div class="dropdown-divider"></div>
+          <a
+            class="dropdown-item <%= path === '/admin/products' ? 'active' : '' %>"
+            href="/admin/products"
+            >Admin Products
+          </a>
+          <a
+            class="dropdown-item <%= path === '/admin/orders' ? 'active' : '' %>"
+            href="/admin/orders"
+            >Admin Orders
+          </a>
+        </div>
       </li>
-      <li class="nav-item">
-        <a
-          class="nav-link <%= path === '/admin/products' ? 'active' : '' %>"
-          href="/admin/products"
-          >Admin Products
-        </a>
-      </li>
+
       <% } %> <% } %> <% if (isAuthenticated) { %>
       <li class="nav-item">
         <form action="/logout" method="POST">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <button class="btn btn-primary btn-outline" type="submit">
+
+          <button class="btn nav-link" type="submit">
             Logout
+            <!-- <i class="fas fa-sign-out-alt"></i> -->
           </button>
         </form>
       </li>

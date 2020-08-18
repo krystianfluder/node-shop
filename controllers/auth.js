@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const { transporter } = require("../config/mails");
 const Profile = require("../models/profile");
+const { handleError500 } = require("../util/errors");
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
@@ -12,7 +13,6 @@ exports.getLogin = (req, res, next) => {
     message = null;
   }
   res.render("auth/login", {
-    path: "/login",
     pageTitle: "Login",
     errorMessage: message,
     oldInput: {
@@ -31,7 +31,6 @@ exports.getRegister = (req, res, next) => {
     message = null;
   }
   res.render("auth/register", {
-    path: "/register",
     pageTitle: "Register",
     errorMessage: message,
     oldInput: {
@@ -49,7 +48,6 @@ exports.postLogin = (req, res, next) => {
 
   if (!errors.isEmpty()) {
     return res.status(422).render("auth/login", {
-      path: "/login",
       pageTitle: "Login",
       errorMessage: errors.array()[0].msg,
       oldInput: {
@@ -84,11 +82,12 @@ exports.postLogin = (req, res, next) => {
           res.redirect("/login");
         })
         .catch((err) => {
-          res.redirect("/login");
-          console.log(err);
+          return next(handleError500(err));
         });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      return next(handleError500(err));
+    });
 };
 
 exports.postRegister = (req, res, next) => {
@@ -97,7 +96,6 @@ exports.postRegister = (req, res, next) => {
 
   if (!errors.isEmpty()) {
     return res.status(422).render("auth/register", {
-      path: "/register",
       pageTitle: "Register",
       errorMessage: errors.array()[0].msg,
       oldInput: {
@@ -128,22 +126,18 @@ exports.postRegister = (req, res, next) => {
           html: `<b>${email}</b>`, // html
         })
         .catch((err) => {
-          const error = new Error(err);
-          error.status = 500;
-          return next(error);
+          return next(handleError500(err));
         });
       return res.redirect("/login");
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    if (err) console.log(err);
+    if (err) return next(handleError500(err));
     return res.redirect("/");
   });
 };
@@ -156,7 +150,6 @@ exports.getReset = (req, res, next) => {
     message = null;
   }
   res.render("auth/reset", {
-    path: "/reset",
     pageTitle: "Reset Password",
     errorMessage: message,
   });
@@ -165,8 +158,7 @@ exports.getReset = (req, res, next) => {
 exports.postReset = (req, res, next) => {
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
-      console.log(err);
-      return res.redirect("/reset");
+      return next(handleError500(err));
     }
     const token = buffer.toString("hex");
     Profile.findOne({ email: req.body.email })
@@ -194,17 +186,13 @@ exports.postReset = (req, res, next) => {
           `,
             })
             .catch((err) => {
-              const error = new Error(err);
-              error.status = 500;
-              return next(error);
+              return next(handleError500(err));
             });
           res.redirect("/new-password");
         }
       })
       .catch((err) => {
-        const error = new Error(err);
-        error.status = 500;
-        return next(error);
+        return next(handleError500(err));
       });
   });
 };
@@ -217,7 +205,6 @@ exports.getNewPassword = (req, res, next) => {
     message = null;
   }
   res.render("auth/new-password", {
-    path: "/new-password",
     pageTitle: "Set new password",
     errorMessage: message,
     token: "",
@@ -233,7 +220,6 @@ exports.getNewPasswordWithToken = (req, res, next) => {
     message = null;
   }
   res.render("auth/new-password", {
-    path: "/new-password",
     pageTitle: "Set new password",
     errorMessage: message,
     token,
@@ -269,8 +255,6 @@ exports.postNewPassword = (req, res, next) => {
       }
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };

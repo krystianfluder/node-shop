@@ -4,7 +4,7 @@ const Product = require("../models/product");
 const Order = require("../models/order");
 const { validationResult } = require("express-validator");
 const fileHelper = require("../util/file");
-
+const { handleError500 } = require("../util/errors");
 const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
 
 exports.getAddProduct = (req, res, next) => {
@@ -16,7 +16,6 @@ exports.getAddProduct = (req, res, next) => {
   }
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
-    path: "/admin/add-product",
     editing: false,
     errorMessage: message,
     product: {
@@ -39,7 +38,6 @@ exports.postAddProduct = (req, res, next) => {
   const response = (errorMessage, validationErrors) => {
     res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
-      path: "/admin/add-product",
       editing: false,
       product: {
         title,
@@ -60,7 +58,9 @@ exports.postAddProduct = (req, res, next) => {
   sharp(req.file.path)
     .resize(200, 200)
     .toFile(`images/small-${filename}`, (err, info) => {
-      console.log(err, info);
+      if (err) {
+        return next(handleError500(err));
+      }
     });
 
   const product = new Product({
@@ -77,9 +77,7 @@ exports.postAddProduct = (req, res, next) => {
       res.redirect("/");
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
@@ -94,17 +92,15 @@ exports.getEditProduct = (req, res, next) => {
   if (!editMode) {
     return res.redirect("/");
   }
-  const prodId = req.params.productId;
-  console.log(prodId);
-  Product.findById(prodId)
+  const { productId } = req.params;
+  Product.findById(productId)
+    .lean()
     .then((product) => {
       if (!product) {
         return res.redirect("/admin/products");
       }
-      console.log(product);
       return res.render("admin/edit-product", {
         pageTitle: "Edit Product",
-        path: "/admin/edit-product",
         editing: editMode,
         product,
         errorMessage: message,
@@ -112,9 +108,7 @@ exports.getEditProduct = (req, res, next) => {
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
@@ -125,7 +119,6 @@ exports.postEditProduct = (req, res, next) => {
   const response = (errorMessage, validationErrors) =>
     res.status(422).render("admin/edit-product", {
       pageTitle: "Edit Product",
-      path: "/admin/edit-product",
       editing: true,
       product: {
         _id: productId,
@@ -153,40 +146,34 @@ exports.postEditProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+    .lean()
     .then((products) => {
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",
-        path: "/admin/products",
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
+  const { productId } = req.body;
 
-  Product.findByIdAndDelete(prodId)
+  Product.findByIdAndDelete(productId)
     .then((product) => {
       fileHelper.deleteFile(product.imageUrl);
       res.redirect("/admin/products");
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
@@ -206,7 +193,6 @@ exports.getOrders = async (req, res, next) => {
 
   res.render("admin/orders", {
     pageTitle: "Admin Products",
-    path: "/admin/orders",
     orders,
     totalOrders,
     currentPage: page,

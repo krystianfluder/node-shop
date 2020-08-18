@@ -5,7 +5,7 @@ const PDFDocument = require("pdfkit");
 const Product = require("../models/product");
 const Order = require("../models/order");
 const { transporter } = require("../config/mails");
-
+const { handleError500 } = require("../util/errors");
 const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
 
 exports.getIndex = (req, res, next) => {
@@ -20,6 +20,7 @@ exports.getIndex = (req, res, next) => {
     .then((numProducts) => {
       totalProducts = numProducts;
       return Product.find()
+        .lean()
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE);
     })
@@ -27,7 +28,6 @@ exports.getIndex = (req, res, next) => {
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
-        path: "/",
         totalProducts,
         currentPage: page,
         hasPrev: page > 1,
@@ -37,42 +37,36 @@ exports.getIndex = (req, res, next) => {
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+    .lean()
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
-        path: "/products",
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
 exports.getProduct = (req, res, next) => {
-  const prodId = req.params.productId;
-  Product.findById(prodId)
+  const { productId } = req.params;
+  Product.findById(productId)
+    .lean()
     .then((product) => {
       res.render("shop/product-detail", {
         product,
         pageTitle: product.title,
-        path: "/products",
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
@@ -88,16 +82,13 @@ exports.getCart = (req, res, next) => {
         totalPrice += p.quantity * p.productId.price;
       });
       res.render("shop/cart", {
-        path: "/cart",
         pageTitle: "Your Cart",
         products,
         totalPrice,
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
@@ -117,7 +108,7 @@ exports.getCartItems = (req, res, next) => {
       });
     })
     .catch((err) => {
-      return res.json({
+      return res.status(500).json({
         message: "Cart Items Error",
       });
     });
@@ -137,29 +128,17 @@ exports.postCart = async (req, res, next) => {
   await req.profile.addToCart(product, quantity);
 
   res.redirect("/cart");
-
-  // .then((product) => {
-  //   req.profile.addToCart(product);
-  //   res.redirect("/cart");
-  // })
-  // .catch((err) => {
-  //   const error = new Error(err);
-  //   error.status = 500;
-  //   return next(error);
-  // });
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
+  const { productId } = req.body;
   req.profile
-    .removeFromCart(prodId)
+    .removeFromCart(productId)
     .then((result) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
@@ -182,7 +161,6 @@ exports.getOrders = (req, res, next) => {
     })
     .then((orders) => {
       res.render("shop/orders", {
-        path: "/orders",
         pageTitle: "Orders",
         orders,
         totalOrders,
@@ -194,9 +172,7 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
@@ -227,15 +203,12 @@ exports.getInvoice = (req, res, next) => {
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.status = 500;
-      return next(error);
+      return next(handleError500(err));
     });
 };
 
 exports.getCheckout = async (req, res, next) => {
   res.render("shop/checkout", {
-    path: "/checkout",
     pageTitle: "Checkout",
   });
 };
@@ -244,9 +217,7 @@ exports.postCheckout = async (req, res, next) => {
   const { products } = req.body;
 
   if (!products) {
-    const err = new Error("Cart does not exist");
-    err.status = 400;
-    return next(err);
+    return next(handleError("Cart does not exist", 400));
   }
 
   let productsIds = [];
@@ -260,9 +231,7 @@ exports.postCheckout = async (req, res, next) => {
   }).countDocuments();
 
   if (productsCounter !== products.length) {
-    const err = new Error("One of the products does not exist");
-    err.status = 400;
-    return next(err);
+    return next(handleError("One of the products does not exist", 400));
   }
   // is valid
 
@@ -373,13 +342,11 @@ exports.postCheckout = async (req, res, next) => {
 exports.getCheckoutSuccess = async (req, res, next) => {
   res.render("shop/checkout-success", {
     pageTitle: "Checkout success",
-    path: "/",
   });
 };
 
 exports.getCheckoutCancel = async (req, res, next) => {
   res.render("shop/checkout-cancel", {
     pageTitle: "Checkout cancel",
-    path: "/",
   });
 };
