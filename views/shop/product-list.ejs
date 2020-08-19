@@ -13,23 +13,23 @@
         <div class="card" style="width: 200px;">
           <img class="card-image-top" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
           <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <strong>
-                <% if (product.title.length >= 10) { product.title = product.title.substring(0, 10)+'...' } %>
-                <%= product.title %>
-              </strong>
-            </li>
-            <li class="list-group-item">
-              <%= product.price/100 %> <%= process.env.CURRENCY %>
+            <li class="list-group-item d-flex flex-column">
               <a href="/products/<%=product._id %>" class="btn btn-link">
-                Read more
+                <strong>
+                  <% if (product.title.length >= 10) { product.title = product.title.substring(0, 10)+'...' } %>
+                  <%= product.title %>
+                </strong>
               </a>
             </li>
             <li class="list-group-item">
-              <% if (isAuthenticated) { %>
-                <%- include('../includes/add-to-cart.ejs', {product, quantity: 1, message: "Add to Cart"}) %>
-              <% } %>
+              <%= product.price/100 %> <%= process.env.CURRENCY %>
             </li>
+            <% if (isAuthenticated) { %>
+              <li class="list-group-item">
+                <%- include('../includes/add-to-cart.ejs', {product, quantity: 1, message: "Add to Cart"}) %>
+              </li>
+            <% } %>
+
           </ul>
         </div>
       <% } %>

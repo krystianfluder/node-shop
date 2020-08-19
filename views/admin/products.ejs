@@ -9,32 +9,34 @@
   <%- include('../includes/breadcrumbs-and-header.ejs') %>
   <% if (prods.length > 0) { %>
 
-  <div class="d-flex">
-    <% for (let product of prods) { %>
-      <div class="card" style="width: 200px;">     
-        <img class="card-image-top" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
-        <div class="card-body">
-          <h2>
-            <%= product.title %>
-          </h2>
-          <p>
-              <%= product.price/100 %> <%= process.env.CURRENCY %> 
-          </p>
-          <p>
-            <%= product.description %>
-          </p>
-          <div class="card-group d-flex justify-content-between">
-            <a href="/admin/edit-product/<%= product._id %>?edit=true" class="btn btn-primary">Edit</a>
-            <form action="/admin/delete-product" method="POST">
-              <input type="hidden" value="<%= product._id %>" name="productId">
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button class="btn btn-danger" type="submit">Delete</button>
-            </form>
-          </div>
+    <div class="d-flex flex-wrap">
+      <% for (let product of prods) { %>
+        <div class="card" style="width: 200px;">
+          <img class="card-image-top" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex flex-column">
+              <a href="/products/<%=product._id %>" class="btn btn-link">
+                <strong>
+                  <% if (product.title.length >= 10) { product.title = product.title.substring(0, 10)+'...' } %>
+                  <%= product.title %>
+                </strong>
+              </a>
+            </li>
+            <li class="list-group-item">
+              <%= product.price/100 %> <%= process.env.CURRENCY %>
+            </li>
+            <li class="list-group-item d-flex flex-column">
+              <a href="/admin/edit-product/<%= product._id %>?edit=true" class="btn btn-primary">Edit</a>
+              <form action="/admin/delete-product" method="POST" class="d-flex flex-column">
+                <input type="hidden" value="<%= product._id %>" name="productId">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-danger" type="submit">Delete</button>
+              </form>
+            </li>
+          </ul>
         </div>
-      </div>
-    <% } %>
-  </div>
+      <% } %>
+    </div>
 
   <% } else { %>
     <h1>No Products Found!</h1>

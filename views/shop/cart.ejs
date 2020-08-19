@@ -14,18 +14,19 @@
           <div class="card" style="width: 200px;">
             <img class="card-image-top" src="/<%= p.productId.imageUrlSmall %>" alt="<%= p.productId.title %>">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item">
-                <strong>
-                  <% if (p.productId.title.length >= 10) { p.productId.title = p.productId.title.substring(0, 10)+'...' } %>
-                  <%= p.productId.title %>
-                </strong>
+              <li class="list-group-item d-flex flex-column">
+                <a href="/products/<%=p.productId._id %>" class="btn btn-link">
+                  <strong>
+                    <% if (p.productId.title.length >= 10) { p.productId.title = p.productId.title.substring(0, 10)+'...' } %>
+                    <%= p.productId.title %>
+                  </strong>
+                </a>
               </li>
               <li class="list-group-item">
                 <%= p.productId.price/100 %> <%= process.env.CURRENCY %> * <%= p.quantity %> = <%= (p.productId.price/100 * p.quantity).toFixed(2) %> <%= process.env.CURRENCY %>
               </li>
               <li class="list-group-item">
                 <%- include('../includes/add-to-cart.ejs', {product: p.productId, quantity: p.quantity, message: "Update"}) %>
-                
                 <form action="/cart-delete-item" method="POST" class="d-flex flex-column">
                   <input type="hidden" value="<%= p.productId._id %>" name="productId">
                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
