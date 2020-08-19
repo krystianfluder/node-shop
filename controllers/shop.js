@@ -11,18 +11,33 @@ const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
 
 const { generateHr, generateHeader } = require("../util/invoices");
 
-exports.getProducts = (req, res, next) => {
-  Product.find()
-    .lean()
-    .then((products) => {
-      res.render("shop/product-list", {
-        prods: products,
-        pageTitle: "All Products",
-      });
+exports.getProducts = async (req, res, next) => {
+  let page = req.query.page;
+  if (!page) {
+    page = 1;
+  }
+
+  const totalProducts = await Product.find().countDocuments();
+
+  const products = await Product.find()
+    .sort({
+      createdAt: "desc",
     })
-    .catch((err) => {
-      return next(handleError500(err));
-    });
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .select("price title imageUrlSmall")
+    .lean();
+
+  res.render("shop/product-list", {
+    pageTitle: "All Products",
+    products,
+    totalProducts,
+    currentPage: page,
+    hasPrev: page > 1,
+    hasNext: page * ITEMS_PER_PAGE < totalProducts,
+    firstPage: 1,
+    lastPage: Math.ceil(totalProducts / ITEMS_PER_PAGE),
+  });
 };
 
 exports.getProduct = (req, res, next) => {

@@ -6,9 +6,9 @@ const { catchAsync } = require("../middleware/errors");
 
 const router = express.Router();
 
-router.get("/", shopController.getProducts);
+router.get("/", catchAsync(shopController.getProducts));
 
-router.get("/products", shopController.getProducts);
+router.get("/products", catchAsync(shopController.getProducts));
 
 router.get("/products/:productId", shopController.getProduct);
 

@@ -1,5 +1,4 @@
 <%- include('../includes/head.ejs') %>
-<link rel="stylesheet" href="/css/product.css">
 </head>
 
 <body>
@@ -7,14 +6,16 @@
 
 <main class="container">
   <%- include('../includes/breadcrumbs-and-header.ejs') %>
-  <% if (prods.length > 0) { %>
+  <% if (products.length > 0) { %>
 
-    <div class="d-flex flex-wrap">
-      <% for (let product of prods) { %>
-        <div class="card" style="width: 200px;">
-          <img class="card-image-top" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
+    <div class="row">
+      <% products.forEach(product => { %>
+        <div class="card col-md-4 col-lg-3 border-0">         
+          <div class="card-header d-flex align-items-center justify-content-center">
+            <img class="img-fluid" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
+          </div>
           <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex flex-column">
+            <li class="list-group-item d-flex flex-column align-items-center justify-content-center">
               <a href="/products/<%=product._id %>" class="btn btn-link">
                 <strong>
                   <% if (product.title.length >= 10) { product.title = product.title.substring(0, 10)+'...' } %>
@@ -22,7 +23,7 @@
                 </strong>
               </a>
             </li>
-            <li class="list-group-item">
+            <li class="list-group-item d-flex align-items-center justify-content-center">
               <%= product.price/100 %> <%= process.env.CURRENCY %>
             </li>
             <li class="list-group-item d-flex flex-column">
@@ -35,7 +36,7 @@
             </li>
           </ul>
         </div>
-      <% } %>
+      <% }) %>
     </div>
 
   <% } else { %>
@@ -44,3 +45,5 @@
 
 </main>
 <%- include('../includes/end.ejs') %>
+
+

@@ -156,7 +156,7 @@ exports.getProducts = (req, res, next) => {
     .lean()
     .then((products) => {
       res.render("admin/products", {
-        prods: products,
+        products,
         pageTitle: "Admin Products",
       });
     })
