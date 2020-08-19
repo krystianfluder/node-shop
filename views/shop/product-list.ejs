@@ -14,7 +14,10 @@
           <img class="card-image-top" src="/<%= product.imageUrlSmall %>" alt="<%= product.title %>">
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <%= product.title %>
+              <strong>
+                <% if (product.title.length >= 10) { product.title = product.title.substring(0, 10)+'...' } %>
+                <%= product.title %>
+              </strong>
             </li>
             <li class="list-group-item">
               <%= product.price/100 %> <%= process.env.CURRENCY %>
@@ -24,7 +27,7 @@
             </li>
             <li class="list-group-item">
               <% if (isAuthenticated) { %>
-                <%- include('../includes/add-to-cart.ejs', {product, quantity: 1}) %>
+                <%- include('../includes/add-to-cart.ejs', {product, quantity: 1, message: "Add to Cart"}) %>
               <% } %>
             </li>
           </ul>

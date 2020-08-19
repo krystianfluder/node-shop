@@ -3,24 +3,32 @@
 
 <body>
   <%- include('../includes/navigation.ejs') %>
-  <main class="container">
+
+  <main class="container text-justify">
+    <%- include('../includes/breadcrumbs-and-header.ejs') %>
+
+  
     <div class="row">
       <div class="col-lg-6">
         <img class="img-fluid" src="/<%= product.imageUrl %>" alt="<%= product.title %>">
       </div>
       <div class="col-lg-6 p-4 d-flex flex-column justify-content-end align-items-end">
-        <h1><%= product.title %></h1>
         <h2><%= product.price/100 %> <%= process.env.CURRENCY %></h2>
         <% if (isAuthenticated) { %>
-          <%- include('../includes/add-to-cart.ejs', {product, quantity: 1}) %>
+          <%- include('../includes/add-to-cart.ejs', {product, quantity: 1, message: "Add to Cart"}) %>
           <% } %>
       </div>
     </div>
 
     <hr>
 
-    <%= product.description %>
-     
+    <h2>
+      <% if (product.title.length >= 20) { product.title = product.title.substring(0, 20)+'...' } %>
+      <%= product.title %>
+    </h2>
+    <%- product.description %> 
+
+
   </main>
   <%- include('../includes/end.ejs') %>
   <%- include('../includes/add-to-cart-script.ejs') %>

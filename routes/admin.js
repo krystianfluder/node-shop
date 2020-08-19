@@ -45,9 +45,9 @@ router.post(
       .trim()
       .escape()
       .isLength({ min: 3 })
-      .withMessage("Please enter a valid title, least 3 chars")
-      .isAlphanumeric()
-      .withMessage("Please enter a valid title, alphanumeric"),
+      .withMessage("Please enter a valid title, least 3 chars"),
+    // .isAlphanumeric()
+    // .withMessage("Please enter a valid title, alphanumeric"),
     body("price")
       .trim()
       .escape()
@@ -73,9 +73,9 @@ router.post(
       .trim()
       .escape()
       .isLength({ min: 3 })
-      .withMessage("Please enter a valid title, least 3 chars")
-      .isAlphanumeric()
-      .withMessage("Please enter a valid title, alphanumeric"),
+      .withMessage("Please enter a valid title, least 3 chars"),
+    // .isAlphanumeric()
+    // .withMessage("Please enter a valid title, alphanumeric"),
     body("price")
       .trim()
       .escape()

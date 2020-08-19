@@ -24,6 +24,7 @@
     "express-session": "^1.17.0",
     "express-validator": "^6.4.0",
     "helmet": "^3.22.0",
+    "moment": "^2.27.0",
     "mongodb": "^3.5.5",
     "mongoose": "^5.9.6",
     "morgan": "^1.10.0",

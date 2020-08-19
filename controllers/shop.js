@@ -1,4 +1,5 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const moment = require("moment");
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
@@ -7,6 +8,12 @@ const Order = require("../models/order");
 const { transporter } = require("../config/mails");
 const { handleError500 } = require("../util/errors");
 const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
+
+const {
+  generateTableRow,
+  generateHr,
+  generateHeader,
+} = require("../util/invoices");
 
 exports.getIndex = (req, res, next) => {
   let page = req.query.page;
@@ -62,7 +69,7 @@ exports.getProduct = (req, res, next) => {
     .then((product) => {
       res.render("shop/product-detail", {
         product,
-        pageTitle: product.title,
+        pageTitle: "Details",
       });
     })
     .catch((err) => {
@@ -229,7 +236,6 @@ exports.getInvoice = (req, res, next) => {
 
       fs.access(invoicePath, fs.F_OK, (err) => {
         if (err) {
-          console.error(err);
           return next(new Error("Not found pdf file"));
         }
         const file = fs.createReadStream(invoicePath);
@@ -330,23 +336,64 @@ exports.postCheckout = async (req, res, next) => {
     `data/invoices/invoice-${order._id}.pdf`
   );
   doc.pipe(writeStream);
-  doc.text(`Thank you! ${req.profile.email}`);
-  doc.text(`Date of order: ${order.createdAt}`);
-  doc.text(`Total price: ${totalPrice / 100} ${process.env.CURRENCY}`);
-  doc.text("Products: ");
 
-  orderProducts.forEach((product) => {
-    const price = product.product.price * product.quantity;
-    doc.text(
-      `${product.product.title} x ${product.quantity} || ${
-        product.product.price / 100
-      } x ${product.quantity} = ${price / 100} ${process.env.CURRENCY}`
-    );
-    doc.image(product.product.imageUrl, {
-      fit: [200, 200],
-      align: "left",
-    });
+  generateHeader(doc);
+
+  const shipping = {
+    address: "1234 Main Street",
+    city: "San Francisco",
+    state: "CA",
+    country: "US",
+    postal_code: 94111,
+  };
+
+  doc.fillColor("#444444").fontSize(20).text("Invoice", 50, 160);
+
+  generateHr(doc, 185);
+
+  doc
+    .fontSize(10)
+    .text(`Invoice Number: ${order._id}`, 50, 200)
+    .text(`Invoice Date: ${moment(order.createdAt).format("LLL")}`, 50, 215)
+    .text(`Balance Due: ${totalPrice / 100} ${process.env.CURRENCY}`, 50, 230)
+    .text(profile.email, 300, 200)
+    .text(shipping.address, 300, 215)
+    .text(`${shipping.city}, ${shipping.state}, ${shipping.country}`, 300, 230)
+    .moveDown();
+
+  generateHr(doc, 252);
+
+  doc.fillColor("#444444").fontSize(20).text("Products", 50, 330);
+  doc.fontSize(10);
+  doc.moveDown();
+
+  orderProducts.forEach(({ product, quantity }) => {
+    const { title, description } = product;
+
+    const lineTotal = `${((product.price * quantity) / 100).toFixed(2)} ${
+      process.env.CURRENCY
+    }`;
+
+    const price = `${(product.price / 100).toFixed(2)} ${process.env.CURRENCY}`;
+
+    doc.image(product.imageUrlSmall, { width: 70 }).moveDown();
+
+    doc
+      .text(title)
+      .text(`${price} * ${quantity} = ${lineTotal}`)
+      .text(description)
+      .moveDown();
   });
+
+  doc
+    .text(
+      `Balance Due: ${(totalPrice / 100).toFixed(2)} ${process.env.CURRENCY}`,
+      {
+        align: "right",
+      }
+    )
+    .moveDown();
+
   doc.end();
 
   writeStream.on("finish", async () => {
