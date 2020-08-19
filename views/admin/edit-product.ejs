@@ -1,6 +1,4 @@
 <%- include('../includes/head.ejs') %>
-<link rel="stylesheet" href="/css/forms.css">
-<link rel="stylesheet" href="/css/product.css">
 </head>
 
 <body>
@@ -16,7 +14,7 @@
     >
       <div class="form-group">
         <label for="title">Title</label>
-        <input class="form-control <%= validationErrors.find(e => e.param === 'title') ? 'invalid' : '' %>" type="text"
+        <input placeholder="Enter title" class="form-control <%= validationErrors.find(e => e.param === 'title') ? 'invalid' : '' %>" type="text"
         name="title" id="title" value="<%= product.title %>">
       </div>
 
@@ -27,13 +25,13 @@
 
       <div class="form-group">
         <label for="price">Price</label>
-        <input class="form-control <%= validationErrors.find(e => e.param === 'price') ? 'invalid' : '' %>" placeholder="cents"  type="number"
+        <input placeholder="Price in cents" class="form-control <%= validationErrors.find(e => e.param === 'price') ? 'invalid' : '' %>" type="number"
         name="price" id="price" step="1" value="<%= product.price %>">
       </div>
       
       <div class="form-group">
         <label for="description">Description</label>
-        <textarea class="form-control <%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
+        <textarea placeholder="Description" class="form-control <%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
         name="description" id="description" rows="5"><%= product.description %></textarea>
       </div>
 

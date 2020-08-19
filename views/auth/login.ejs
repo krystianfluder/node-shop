@@ -12,16 +12,17 @@
 
     <form action="/login" method="POST">
       <div class="form-group">
-        <label for="email">E-Mail</label>
-        <input class="form-control <%= validationErrors.find(e => e.param === 'email') ? 'invalid' : '' %>" type="email" name="email" id="email" value="<%= oldInput.email==="@" ? '' : oldInput.email %>">
+        <label for="email">Email address</label>
+        <input placeholder="Enter email" class="form-control <%= validationErrors.find(e => e.param === 'email') ? 'invalid' : '' %>" type="email" name="email" id="email" value="<%= oldInput.email==="@" ? '' : oldInput.email %>">
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input class="form-control <%= validationErrors.find(e => e.param === 'password') ? 'invalid' : '' %>" type="password" name="password" id="password" value="<%= oldInput.password %>">
+        <input placeholder="Password" class="form-control <%= validationErrors.find(e => e.param === 'password') ? 'invalid' : '' %>" type="password" name="password" id="password" value="<%= oldInput.password %>">
       </div>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn-primary" type="submit">Login</button>
       <a class="btn btn-link" href="/reset">Reset Password</a>
+      <a class="btn btn-link" href="/register">Create an account</a>
     </form>
     
   </main>

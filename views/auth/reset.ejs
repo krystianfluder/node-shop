@@ -11,8 +11,8 @@
     <%- include('../includes/error-message.ejs') %>
     <form action="/reset" method="POST">
       <div class="form-group">
-        <label for="email">E-Mail</label>
-        <input class="form-control" type="email" name="email" id="email" value="">
+        <label for="email">Email address</label>
+        <input  placeholder="Enter email" class="form-control" type="email" name="email" id="email" value="">
       </div>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn-primary" type="submit">Reset password</button>

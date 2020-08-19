@@ -9,44 +9,7 @@ const { transporter } = require("../config/mails");
 const { handleError500 } = require("../util/errors");
 const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
 
-const {
-  generateTableRow,
-  generateHr,
-  generateHeader,
-} = require("../util/invoices");
-
-exports.getIndex = (req, res, next) => {
-  let page = req.query.page;
-  if (!page) {
-    page = 1;
-  }
-  let totalProducts;
-
-  Product.find()
-    .countDocuments()
-    .then((numProducts) => {
-      totalProducts = numProducts;
-      return Product.find()
-        .lean()
-        .skip((page - 1) * ITEMS_PER_PAGE)
-        .limit(ITEMS_PER_PAGE);
-    })
-    .then((products) => {
-      res.render("shop/index", {
-        prods: products,
-        pageTitle: "Shop",
-        totalProducts,
-        currentPage: page,
-        hasPrev: page > 1,
-        hasNext: page * ITEMS_PER_PAGE < totalProducts,
-        firstPage: 1,
-        lastPage: Math.ceil(totalProducts / ITEMS_PER_PAGE),
-      });
-    })
-    .catch((err) => {
-      return next(handleError500(err));
-    });
-};
+const { generateHr, generateHeader } = require("../util/invoices");
 
 exports.getProducts = (req, res, next) => {
   Product.find()
