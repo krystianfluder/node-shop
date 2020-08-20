@@ -47,7 +47,7 @@ exports.getProduct = (req, res, next) => {
     .then((product) => {
       res.render("shop/product-detail", {
         product,
-        pageTitle: "Details",
+        pageTitle: product.title,
       });
     })
     .catch((err) => {
@@ -150,9 +150,19 @@ exports.getOrders = async (req, res, next) => {
     .select("createdAt totalPrice products status paid")
     .lean();
 
+  // beautiful createdAt
+  const parseOrders = [];
+
+  orders.forEach((order) => {
+    parseOrders.push({
+      ...order,
+      createdAt: moment(order.createdAt).format("LLL"),
+    });
+  });
+
   res.render("shop/paid-orders", {
     pageTitle: "Paid orders",
-    orders,
+    orders: parseOrders,
     totalOrders,
     currentPage: page,
     hasPrev: page > 1,
@@ -185,9 +195,20 @@ exports.getUnpaidOrders = async (req, res, next) => {
     .select("createdAt totalPrice products status paid session.id")
     .lean();
 
+  // beautiful createdAt
+
+  const parseOrders = [];
+
+  orders.forEach((order) => {
+    parseOrders.push({
+      ...order,
+      createdAt: moment(order.createdAt).format("LLL"),
+    });
+  });
+
   res.render("shop/unpaid-orders", {
     pageTitle: "Unpaid orders",
-    orders,
+    orders: parseOrders,
     totalOrders,
     currentPage: page,
     hasPrev: page > 1,
@@ -274,7 +295,6 @@ exports.postCheckout = async (req, res, next) => {
         currency: "eur",
         product_data: {
           name: product.title,
-          description: product.description,
         },
         unit_amount: product.price,
       },
@@ -346,7 +366,7 @@ exports.postCheckout = async (req, res, next) => {
   doc.moveDown();
 
   orderProducts.forEach(({ product, quantity }) => {
-    const { title, description } = product;
+    const { title } = product;
 
     const lineTotal = `${((product.price * quantity) / 100).toFixed(2)} ${
       process.env.CURRENCY
@@ -356,11 +376,7 @@ exports.postCheckout = async (req, res, next) => {
 
     doc.image(product.imageUrlSmall, { width: 70 }).moveDown();
 
-    doc
-      .text(title)
-      .text(`${price} * ${quantity} = ${lineTotal}`)
-      .text(description)
-      .moveDown();
+    doc.text(title).text(`${price} * ${quantity} = ${lineTotal}`).moveDown();
   });
 
   doc

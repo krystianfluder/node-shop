@@ -1,12 +1,37 @@
-const { v4 } = require("uuid");
 const sharp = require("sharp");
 const Product = require("../models/product");
-const Profile = require("../models/profile");
 const Order = require("../models/order");
 const { validationResult } = require("express-validator");
 const fileHelper = require("../util/file");
 const { handleError500 } = require("../util/errors");
 const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
+
+// https://editorjs.io/
+const getHtml = (data) => {
+  const { blocks } = data;
+  let tmpHtml = "";
+  blocks.forEach((block) => {
+    console.log(block);
+    switch (block.type) {
+      case "paragraph":
+        return (tmpHtml += `<p>${block.data.text}</p>\n`);
+      case "header":
+        return (tmpHtml += `<h${block.data.level}>${block.data.text}</h${block.data.level}>\n`);
+      case "list":
+        if (block.data.style === "ordered") {
+          let tmp = "<ol>\n";
+          block.data.items.forEach((item) => {
+            tmp += `<li>${item}</li>\n`;
+          });
+          tmp += "</ol>\n";
+          return (tmpHtml += tmp);
+        }
+      default:
+        return (tmpHtml += `<br>`);
+    }
+  });
+  return tmpHtml;
+};
 
 exports.getAddProduct = (req, res, next) => {
   let message = req.flash("error");
@@ -23,7 +48,7 @@ exports.getAddProduct = (req, res, next) => {
       title: "",
       imageUrl: "",
       price: "",
-      description: "",
+      description: "[]",
       productId: "",
     },
     validationErrors: [],
@@ -70,6 +95,7 @@ exports.postAddProduct = (req, res, next) => {
     imageUrlSmall: `images/small-${filename}`,
     price,
     description,
+    html: getHtml(JSON.parse(description)),
     profileId: req.profile,
   });
   product
@@ -134,16 +160,32 @@ exports.postEditProduct = (req, res, next) => {
   if (!errors.isEmpty()) return response(errors.array()[0].msg, errors.array());
   if (!req.file) return response("Image", []);
 
+  const pathTab = req.file.path.split("/");
+  const filename = pathTab[pathTab.length - 1];
+
+  sharp(req.file.path)
+    .resize(200, 200)
+    .toFile(`images/small-${filename}`, (err, info) => {
+      if (err) {
+        return next(handleError500(err));
+      }
+    });
+
   Product.findById(productId)
     .then((product) => {
-      product.title = title;
       fileHelper.deleteFile(product.imageUrl);
+      fileHelper.deleteFile(product.imageUrlSmall);
+
+      product.title = title;
       product.imageUrl = req.file.path;
+      product.imageUrlSmall = `images/small-${filename}`;
       product.price = price;
       product.description = description;
+      product.html = getHtml(JSON.parse(description));
+
       return product.save();
     })
-    .then((product) => {
+    .then(() => {
       res.redirect("/admin/products");
     })
     .catch((err) => {
@@ -184,7 +226,7 @@ exports.getOrders = async (req, res, next) => {
     page = 1;
   }
   const totalOrders = await Order.countDocuments();
-  const orders = await Order.find()
+  const orders = await Order.find({})
     .select("profile products totalPrice createdAt status paid")
     .sort({
       createdAt: "desc",

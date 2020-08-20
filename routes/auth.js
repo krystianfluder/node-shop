@@ -1,4 +1,6 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
+
 const Profile = require("../models/profile");
 const { body } = require("express-validator");
 
@@ -26,6 +28,13 @@ router.post(
   ],
   authController.postLogin
 );
+
+// const createAccountLimiter = rateLimit({
+//   windowMs: 60 * 60 * 1000, // 1 hour window
+//   max: 5, // start blocking after 5 requests
+//   message:
+//     "Too many accounts created from this IP, please try again after an hour",
+// });
 
 router.post(
   "/register",
@@ -55,6 +64,7 @@ router.post(
         return true;
       }),
   ],
+  // createAccountLimiter,
   authController.postRegister
 );
 
@@ -62,7 +72,18 @@ router.post("/logout", isAuth, authController.postLogout);
 
 router.get("/reset", authController.getReset);
 
-router.post("/reset", authController.postReset);
+// const resetAccountLimiter = rateLimit({
+//   windowMs: 60 * 60 * 1000, // 1 hour window
+//   max: 5, // start blocking after 5 requests
+//   message:
+//     "Reset",
+// });
+
+router.post(
+  "/reset",
+  // resetAccountLimiter,
+  authController.postReset
+);
 
 router.get("/new-password", authController.getNewPassword);
 

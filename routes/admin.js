@@ -53,11 +53,12 @@ router.post(
       .escape()
       .isNumeric()
       .withMessage("Please enter a valid price"),
-    body("description")
-      .trim()
-      .escape()
-      .isLength({ min: 10 })
-      .withMessage("Please enter a valid description, least 10 chars"),
+    // body("description")
+    //   .trim()
+    //   .escape()
+    //   .isLength({ min: 5, max: 100 })
+    //   .withMessage("Please enter a valid description, least 10 chars"),
+    body("description"),
   ],
 
   adminController.postAddProduct
@@ -81,11 +82,14 @@ router.post(
       .escape()
       .isNumeric()
       .withMessage("Please enter a valid price"),
-    body("description")
-      .trim()
-      .escape()
-      .isLength({ min: 10 })
-      .withMessage("Please enter a valid title, least 10 chars"),
+    // body("description")
+    //   .trim()
+    //   .escape()
+    //   .isLength({ min: 5, max: 100 })
+    //   .withMessage(
+    //     "Please enter a valid description, least 5 chars, max 100 chars."
+    //   ),
+    body("description"),
   ],
   adminController.postEditProduct
 );

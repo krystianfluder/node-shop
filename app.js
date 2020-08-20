@@ -4,6 +4,7 @@ const path = require("path");
 // const https = require("https");
 
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -20,6 +21,13 @@ const Profile = require("./models/profile");
 const csrfProtection = csrf();
 
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+app.use(limiter);
 
 app.set("view engine", "ejs");
 app.set("views", "views");

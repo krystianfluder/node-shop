@@ -16,6 +16,10 @@ const productSchema = Schema(
       type: String,
       required: true,
     },
+    html: {
+      type: String,
+      required: true,
+    },
     imageUrl: {
       type: String,
       required: true,

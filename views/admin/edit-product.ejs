@@ -29,17 +29,40 @@
         name="price" id="price" step="1" value="<%= product.price %>">
       </div>
       
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea placeholder="Description" class="form-control <%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
-        name="description" id="description" rows="5"><%= product.description %></textarea>
-      </div>
+      <label for="price">Description</label>
+      <div class="card p-4" id="editorjs"></div>
+      <input type="hidden" class="form-control <%= validationErrors.find(e => e.param === 'html') ? 'invalid' : '' %>"
+        name="description" id="description" rows="10" value="<%= product.description %>" />
 
       <input type="hidden" value="<%= product._id %>" name="productId">
 
-      <button class="btn btn-primary" type="submit"><% if (editing) { %>Update Product<% } else { %>Add Product<% } %></button>
+      <button class="btn btn-primary mt-4" type="submit"><% if (editing) { %>Update Product<% } else { %>Add Product<% } %></button>
     </form>
 
-        
     </main>
     <%- include('../includes/end.ejs') %>
+    
+    <!-- https://editorjs.io/ -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+
+    <script>
+      const descriptionInput = document.querySelector('#description');
+      const editor = new EditorJS({ 
+      tools: { 
+        header: Header, 
+        list: List 
+      }, 
+        holder: 'editorjs', 
+        data: JSON.parse(descriptionInput.value),
+        onChange: () => {
+          const htmlWrapper = document.querySelector('#description');
+          editor.save().then((outputData) => {
+            htmlWrapper.value = JSON.stringify(outputData);
+          }).catch((error) => {
+            console.log('Saving failed: ', error)
+          });
+        }
+      })
+    </script>
