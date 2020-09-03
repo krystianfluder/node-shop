@@ -8,7 +8,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/krystian-fluder/node-shop">
+  <a href="https://github.com/krystianfluder/node-shop">
     <img src="public/img/node.png" alt="Logo" width="100">
   </a>
 
@@ -17,14 +17,14 @@
   <p align="center">
     Online store, invoices, resetting accounts, order list, paying for pending orders and much more.
     <br />
-    <a href="https://github.com/krystian-fluder/node-shop"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/krystianfluder/node-shop"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/krystian-fluder/node-shop">View Demo</a>
+    <a href="https://github.com/krystianfluder/node-shop">View Demo</a>
     ·
-    <a href="https://github.com/krystian-fluder/node-shop/issues">Report Bug</a>
+    <a href="https://github.com/krystianfluder/node-shop/issues">Report Bug</a>
     ·
-    <a href="https://github.com/krystian-fluder/node-shop/issues">Request Feature</a>
+    <a href="https://github.com/krystianfluder/node-shop/issues">Request Feature</a>
   </p>
 </p>
 
@@ -81,7 +81,7 @@ npm install npm@latest -g
 1. Clone the repo
 
 ```sh
-git clone https://github.com/krystian-fluder/node-shop.git
+git clone https://github.com/krystianfluder/node-shop.git
 ```
 
 2. Install NPM packages
@@ -108,7 +108,7 @@ cp .env.example .env
 
 ## Roadmap
 
-See the [open issues](https://github.com/krystian-fluder/node-shop/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/krystianfluder/node-shop/issues) for a list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 
@@ -126,7 +126,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the GNU GENERAL PUBLIC LICENSE. See `LICENSE` for more information.
 
 <!-- CONTACT -->
 
@@ -134,7 +134,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 krystian.fluder@outlook.com
 
-Project Link: [https://github.com/krystian-fluder/node-shop](https://github.com/krystian-fluder/node-shop)
+Project Link: [https://github.com/krystianfluder/node-shop](https://github.com/krystianfluder/node-shop)
 
 <!-- ACKNOWLEDGEMENTS -->
 
@@ -145,16 +145,16 @@ Project Link: [https://github.com/krystian-fluder/node-shop](https://github.com/
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/krystian-fluder/repo.svg?style=flat-square
-[contributors-url]: https://github.com/krystian-fluder/repo/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/krystian-fluder/repo.svg?style=flat-square
-[forks-url]: https://github.com/krystian-fluder/repo/network/members
-[stars-shield]: https://img.shields.io/github/stars/krystian-fluder/repo.svg?style=flat-square
-[stars-url]: https://github.com/krystian-fluder/repo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/krystian-fluder/repo.svg?style=flat-square
-[issues-url]: https://github.com/krystian-fluder/repo/issues
-[license-shield]: https://img.shields.io/github/license/krystian-fluder/repo.svg?style=flat-square
-[license-url]: https://github.com/krystian-fluder/repo/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/krystianfluder/node-shop.svg?style=flat-square
+[contributors-url]: https://github.com/krystianfluder/node-shop/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/krystianfluder/node-shop.svg?style=flat-square
+[forks-url]: https://github.com/krystianfluder/node-shop/network/members
+[stars-shield]: https://img.shields.io/github/stars/krystianfluder/node-shop.svg?style=flat-square
+[stars-url]: https://github.com/krystianfluder/node-shop/stargazers
+[issues-shield]: https://img.shields.io/github/issues/krystianfluder/node-shop.svg?style=flat-square
+[issues-url]: https://github.com/krystianfluder/node-shop/issues
+[license-shield]: https://img.shields.io/github/license/krystianfluder/node-shop.svg?style=flat-square
+[license-url]: https://github.com/krystianfluder/node-shop/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/krystian-fluder
+[linkedin-url]: https://linkedin.com/in/krystianfluder
 [product-screenshot]: public/img/node.png

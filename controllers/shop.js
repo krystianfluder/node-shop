@@ -49,6 +49,7 @@ exports.getProduct = (req, res, next) => {
       res.render("shop/product-detail", {
         product,
         pageTitle: product.title,
+        pageDescription: "lorem",
       });
     })
     .catch((err) => {
@@ -266,6 +267,7 @@ exports.getInvoice = (req, res, next) => {
 exports.getCheckout = async (req, res, next) => {
   res.render("shop/checkout", {
     pageTitle: "Checkout",
+    pageDescription: "lorem",
   });
 };
 

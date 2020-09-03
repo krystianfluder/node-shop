@@ -181,6 +181,7 @@ exports.getProducts = (req, res, next) => {
       res.render("admin/products", {
         products,
         pageTitle: "Admin Products",
+        pageDescription: "lorem",
       });
     })
     .catch((err) => {
