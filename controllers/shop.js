@@ -30,6 +30,7 @@ exports.getProducts = async (req, res, next) => {
 
   res.render("shop/product-list", {
     pageTitle: "All Products",
+    pageDescription: "lorem",
     products,
     totalProducts,
     currentPage: page,
@@ -55,26 +56,38 @@ exports.getProduct = (req, res, next) => {
     });
 };
 
-// fix empty - product does not exist
-exports.getCart = (req, res, next) => {
-  req.profile
-    .populate("cart.items.productId")
-    .execPopulate()
-    .then((profile) => {
-      const products = profile.cart.items;
-      let totalPrice = 0;
-      products.forEach((p) => {
-        totalPrice += p.quantity * p.productId.price;
-      });
-      res.render("shop/cart", {
-        pageTitle: "Your Cart",
-        products,
-        totalPrice,
-      });
-    })
-    .catch((err) => {
-      return next(handleError500(err));
-    });
+exports.getCart = async (req, res, next) => {
+  let message = req.flash("error");
+
+  const { profile } = req;
+  await profile.populate("cart.items.productId").execPopulate();
+
+  const products = profile.cart.items;
+  const parseProducts = [];
+  let totalPrice = 0;
+
+  products.forEach((product) => {
+    if (product.productId) {
+      totalPrice += product.productId.price * product.quantity;
+      parseProducts.push(product);
+    }
+  });
+
+  if (products.length !== parseProducts.length) {
+    message = "Non-existent products have been removed";
+    profile.cart.items = parseProducts;
+    await profile.save();
+  } else {
+    message = null;
+  }
+
+  res.render("shop/cart", {
+    pageTitle: "Your Cart",
+    pageDescription: "lorem",
+    products: parseProducts,
+    errorMessage: message,
+    totalPrice,
+  });
 };
 
 exports.getCartItems = (req, res, next) => {
@@ -162,6 +175,7 @@ exports.getOrders = async (req, res, next) => {
 
   res.render("shop/paid-orders", {
     pageTitle: "Paid orders",
+    pageDescription: "lorem",
     orders: parseOrders,
     totalOrders,
     currentPage: page,
@@ -208,6 +222,7 @@ exports.getUnpaidOrders = async (req, res, next) => {
 
   res.render("shop/unpaid-orders", {
     pageTitle: "Unpaid orders",
+    pageDescription: "lorem",
     orders: parseOrders,
     totalOrders,
     currentPage: page,
@@ -327,7 +342,7 @@ exports.postCheckout = async (req, res, next) => {
     totalPrice,
   });
 
-  await order.save();
+  await Promise.all([profile.clearCart(), order.save()]);
 
   const doc = new PDFDocument();
   const writeStream = fs.createWriteStream(
@@ -392,7 +407,7 @@ exports.postCheckout = async (req, res, next) => {
 
   writeStream.on("finish", async () => {
     await transporter.sendMail({
-      from: "test@test.com",
+      from: process.env.SERVER_EMAIL,
       to: profile.email,
       subject: "invoice ✔", // Subject line
       // text: "", // plain text body
@@ -413,6 +428,7 @@ exports.postCheckout = async (req, res, next) => {
 
   res.json({
     message: "Order created",
+    pageDescription: "lorem",
     session,
   });
 };
@@ -420,11 +436,13 @@ exports.postCheckout = async (req, res, next) => {
 exports.getCheckoutSuccess = async (req, res, next) => {
   res.render("shop/checkout-success", {
     pageTitle: "Checkout success",
+    pageDescription: "lorem",
   });
 };
 
 exports.getCheckoutCancel = async (req, res, next) => {
   res.render("shop/checkout-cancel", {
     pageTitle: "Checkout cancel",
+    pageDescription: "lorem",
   });
 };

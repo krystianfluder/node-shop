@@ -27,7 +27,7 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
 });
 
-app.use(limiter);
+// app.use(limiter);
 
 app.set("view engine", "ejs");
 app.set("views", "views");

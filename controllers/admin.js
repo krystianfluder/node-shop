@@ -6,32 +6,9 @@ const fileHelper = require("../util/file");
 const { handleError500 } = require("../util/errors");
 const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE);
 
+const editorjs = require("../util/editorjs");
+
 // https://editorjs.io/
-const getHtml = (data) => {
-  const { blocks } = data;
-  let tmpHtml = "";
-  blocks.forEach((block) => {
-    console.log(block);
-    switch (block.type) {
-      case "paragraph":
-        return (tmpHtml += `<p>${block.data.text}</p>\n`);
-      case "header":
-        return (tmpHtml += `<h${block.data.level}>${block.data.text}</h${block.data.level}>\n`);
-      case "list":
-        if (block.data.style === "ordered") {
-          let tmp = "<ol>\n";
-          block.data.items.forEach((item) => {
-            tmp += `<li>${item}</li>\n`;
-          });
-          tmp += "</ol>\n";
-          return (tmpHtml += tmp);
-        }
-      default:
-        return (tmpHtml += `<br>`);
-    }
-  });
-  return tmpHtml;
-};
 
 exports.getAddProduct = (req, res, next) => {
   let message = req.flash("error");
@@ -42,6 +19,7 @@ exports.getAddProduct = (req, res, next) => {
   }
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
+    pageDescription: "lorem",
     editing: false,
     errorMessage: message,
     product: {
@@ -64,6 +42,7 @@ exports.postAddProduct = (req, res, next) => {
   const response = (errorMessage, validationErrors) => {
     res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
+      pageDescription: "lorem",
       editing: false,
       product: {
         title,
@@ -95,7 +74,7 @@ exports.postAddProduct = (req, res, next) => {
     imageUrlSmall: `images/small-${filename}`,
     price,
     description,
-    html: getHtml(JSON.parse(description)),
+    html: editorjs.getHtml(JSON.parse(description)),
     profileId: req.profile,
   });
   product
@@ -128,6 +107,7 @@ exports.getEditProduct = (req, res, next) => {
       }
       return res.render("admin/edit-product", {
         pageTitle: "Edit Product",
+        pageDescription: "lorem",
         editing: editMode,
         product,
         errorMessage: message,
@@ -146,6 +126,7 @@ exports.postEditProduct = (req, res, next) => {
   const response = (errorMessage, validationErrors) =>
     res.status(422).render("admin/edit-product", {
       pageTitle: "Edit Product",
+      pageDescription: "lorem",
       editing: true,
       product: {
         _id: productId,
@@ -181,7 +162,7 @@ exports.postEditProduct = (req, res, next) => {
       product.imageUrlSmall = `images/small-${filename}`;
       product.price = price;
       product.description = description;
-      product.html = getHtml(JSON.parse(description));
+      product.html = editorjs.getHtml(JSON.parse(description));
 
       return product.save();
     })
@@ -237,6 +218,7 @@ exports.getOrders = async (req, res, next) => {
 
   res.render("admin/orders", {
     pageTitle: "Admin Products",
+    pageDescription: "lorem",
     orders,
     totalOrders,
     currentPage: page,

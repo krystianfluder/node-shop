@@ -5,6 +5,8 @@
     <%- include('../includes/navigation.ejs') %>
     <main class="container">
       <%- include('../includes/breadcrumbs-and-header.ejs') %>
+      <%- include('../includes/error-message.ejs') %>
+
       <% if (products.length > 0) { %>
 
       <h2 class="mb-4">Total price: <%= totalPrice/100 %> <%= process.env.CURRENCY %></h2>

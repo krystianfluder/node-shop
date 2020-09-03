@@ -12,7 +12,7 @@ router.get("/products", catchAsync(shopController.getProducts));
 
 router.get("/products/:productId", shopController.getProduct);
 
-router.get("/cart", isAuth, shopController.getCart);
+router.get("/cart", isAuth, catchAsync(shopController.getCart));
 
 router.post("/cart", isAuth, catchAsync(shopController.postCart));
 

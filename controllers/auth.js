@@ -14,6 +14,7 @@ exports.getLogin = (req, res, next) => {
   }
   res.render("auth/login", {
     pageTitle: "Login",
+    pageDescription: "lorem",
     errorMessage: message,
     oldInput: {
       email: "",
@@ -32,6 +33,7 @@ exports.getRegister = (req, res, next) => {
   }
   res.render("auth/register", {
     pageTitle: "Register",
+    pageDescription: "lorem",
     errorMessage: message,
     oldInput: {
       email: "",
@@ -49,6 +51,7 @@ exports.postLogin = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(422).render("auth/login", {
       pageTitle: "Login",
+      pageDescription: "lorem",
       errorMessage: errors.array()[0].msg,
       oldInput: {
         email,
@@ -97,6 +100,7 @@ exports.postRegister = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(422).render("auth/register", {
       pageTitle: "Register",
+      pageDescription: "lorem",
       errorMessage: errors.array()[0].msg,
       oldInput: {
         email,
@@ -120,7 +124,7 @@ exports.postRegister = (req, res, next) => {
     .then(() => {
       transporter
         .sendMail({
-          from: "test@test.com",
+          from: process.env.SERVER_EMAIL,
           to: email,
           subject: "register",
           html: `<b>${email}</b>`, // html
@@ -151,6 +155,7 @@ exports.getReset = (req, res, next) => {
   }
   res.render("auth/reset", {
     pageTitle: "Reset Password",
+    pageDescription: "lorem",
     errorMessage: message,
   });
 };
@@ -167,7 +172,6 @@ exports.postReset = (req, res, next) => {
           req.flash("error", "Email not exist");
           return res.redirect("/reset");
         }
-        // console.log(profile);
         profile.resetToken = token;
         profile.resetTokenExpiration = Date.now() + 3600000;
         return profile.save();
@@ -176,7 +180,7 @@ exports.postReset = (req, res, next) => {
         if (profile) {
           transporter
             .sendMail({
-              from: "test@test.com",
+              from: process.env.SERVER_EMAIL,
               to: profile.email,
               subject: "Reset password",
               html: `
@@ -206,6 +210,7 @@ exports.getNewPassword = (req, res, next) => {
   }
   res.render("auth/new-password", {
     pageTitle: "Set new password",
+    pageDescription: "lorem",
     errorMessage: message,
     token: "",
   });
@@ -221,6 +226,7 @@ exports.getNewPasswordWithToken = (req, res, next) => {
   }
   res.render("auth/new-password", {
     pageTitle: "Set new password",
+    pageDescription: "lorem",
     errorMessage: message,
     token,
   });

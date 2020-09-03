@@ -22,18 +22,21 @@
         <label for="image">Image</label>
         <input class="form-control-file" type="file" name="image" id="image">
       </div>
-
+      
       <div class="form-group">
         <label for="price">Price</label>
         <input placeholder="Price in cents" class="form-control <%= validationErrors.find(e => e.param === 'price') ? 'invalid' : '' %>" type="number"
         name="price" id="price" step="1" value="<%= product.price %>">
       </div>
-      
-      <label for="price">Description</label>
-      <div class="card p-4" id="editorjs"></div>
-      <input type="hidden" class="form-control <%= validationErrors.find(e => e.param === 'html') ? 'invalid' : '' %>"
-        name="description" id="description" rows="10" value="<%= product.description %>" />
 
+      <div class="form-group">
+        <label for="price">Description</label>
+        <input type="hidden" class="form-control <%= validationErrors.find(e => e.param === 'html') ? 'invalid' : '' %>"
+        name="description" id="description" rows="10" value="<%= product.description %>" />
+      </div>
+
+      <div class="card p-4" id="editorjs"></div>
+     
       <input type="hidden" value="<%= product._id %>" name="productId">
 
       <button class="btn btn-primary mt-4" type="submit"><% if (editing) { %>Update Product<% } else { %>Add Product<% } %></button>
@@ -46,20 +49,29 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script>
 
     <script>
       const descriptionInput = document.querySelector('#description');
       const editor = new EditorJS({ 
-      tools: { 
-        header: Header, 
-        list: List 
-      }, 
+        tools: { 
+          header: Header, 
+          list: List, 
+          embed: Embed,
+          image: SimpleImage,
+          table: {
+            class: Table,
+          },
+        }, 
         holder: 'editorjs', 
         data: JSON.parse(descriptionInput.value),
         onChange: () => {
           const htmlWrapper = document.querySelector('#description');
           editor.save().then((outputData) => {
             htmlWrapper.value = JSON.stringify(outputData);
+            descriptionViewer.textContent = JSON.stringify(outputData)
           }).catch((error) => {
             console.log('Saving failed: ', error)
           });
