@@ -9,7 +9,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/krystianfluder/node-shop">
-    <img src="public/img/node.png" alt="Logo" width="100">
+    <img src="ss/phone.png" alt="Logo" width="100">
   </a>
 
   <h3 align="center">node-shop</h3>
@@ -157,4 +157,4 @@ Project Link: [https://github.com/krystianfluder/node-shop](https://github.com/k
 [license-url]: https://github.com/krystianfluder/node-shop/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/krystianfluder
-[product-screenshot]: public/img/node.png
+[product-screenshot]: ss/full.png
