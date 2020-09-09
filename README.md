@@ -2,7 +2,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/krystianfluder/node-shop/blob/master/LICENSE)
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 <!-- PROJECT LOGO -->
@@ -17,11 +17,7 @@
   <p align="center">
     Online store, invoices, resetting accounts, order list, paying for pending orders and much more.
     <br />
-    <a href="https://github.com/krystianfluder/node-shop"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/krystianfluder/node-shop">View Demo</a>
-    ·
     <a href="https://github.com/krystianfluder/node-shop/issues">Report Bug</a>
     ·
     <a href="https://github.com/krystianfluder/node-shop/issues">Request Feature</a>
@@ -102,7 +98,17 @@ cp .env.example .env
 
 ## Usage
 
-[Demo](https://example.com)
+Development
+
+```sh
+npm start
+```
+
+Production
+
+```sh
+npm run prod
+```
 
 <!-- ROADMAP -->
 
@@ -153,8 +159,6 @@ Project Link: [https://github.com/krystianfluder/node-shop](https://github.com/k
 [stars-url]: https://github.com/krystianfluder/node-shop/stargazers
 [issues-shield]: https://img.shields.io/github/issues/krystianfluder/node-shop.svg?style=flat-square
 [issues-url]: https://github.com/krystianfluder/node-shop/issues
-[license-shield]: https://img.shields.io/github/license/krystianfluder/node-shop.svg?style=flat-square
-[license-url]: https://github.com/krystianfluder/node-shop/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/krystianfluder
 [product-screenshot]: ss/full.png

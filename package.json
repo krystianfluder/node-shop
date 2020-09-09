@@ -1,7 +1,7 @@
 {
   "name": "node-shop",
   "version": "1.0.0",
-  "description": "Course with Maximilian Schwarzmüller",
+  "description": "Online store, invoices, resetting accounts, order list, paying for pending orders and much more.",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
